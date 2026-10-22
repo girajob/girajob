@@ -77,11 +77,9 @@ function Auditoria() {
 
   async function setBlocked(companyId: string, blocked: boolean) {
     setBusy(true);
-    const { error } = await supabase.rpc("set_company_blocked", {
-      _company: companyId,
-      _blocked: blocked,
-      _reason: blocked ? reason.trim() || "Mensalidade em atraso" : undefined,
-    });
+    const args: { _company: string; _blocked: boolean; _reason?: string } = { _company: companyId, _blocked: blocked };
+    if (blocked) args._reason = reason.trim() || "Mensalidade em atraso";
+    const { error } = await supabase.rpc("set_company_blocked", args);
     setBusy(false);
     if (error) { toast.error(errMsg(error)); return; }
     toast.success(blocked ? "Cliente bloqueado" : "Cliente desbloqueado");
