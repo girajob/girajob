@@ -36,6 +36,13 @@
       "when": 1792694068057,
       "tag": "0004_dual_fees_revenue_report",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792694418826,
+      "tag": "0005_contractor_reports_event_revenues",
+      "breakpoints": true
     }
   ]
 }
