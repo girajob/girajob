@@ -127,6 +127,41 @@ export function JobForm({ job }: { job?: Job | null }) {
         </div>
         <Field label="Descrição *" error={errors.description}><Textarea value={f.description} onChange={set("description")} maxLength={3000} rows={4} /></Field>
       </div>
+      <div className="space-y-3 rounded-2xl border bg-card p-5 shadow-card">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span className="text-sm font-semibold">Cargos deste evento</span>
+          <Button type="button" size="sm"
+            onClick={() => setRoles([...roles, { category_id: "", label: "", positions: 1, pay_amount: f.pay_amount || 0, entry_time: f.start_time }])}>
+            <Plus /> Adicionar cargo
+          </Button>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Um mesmo evento pode ter garçom, faxineiro, segurança… cada cargo com quantidade, valor e horário de
+          entrada próprios (ex.: caixas às 13h, seguranças às 10h). Se não adicionar cargos, vale a quantidade e a
+          remuneração informadas nos campos do evento.
+        </p>
+        {roles.map((r, i) => (
+          <div key={i} className="space-y-3 rounded-xl border p-3">
+            <div className="flex items-center justify-between gap-2">
+              <Input value={r.label} onChange={(e) => updRole(i, { label: e.target.value })} maxLength={80} placeholder="Nome do cargo — ex.: Segurança" className="max-w-xs" />
+              <Button type="button" variant="ghost" size="sm" onClick={() => setRoles(roles.filter((_, j) => j !== i))}>
+                <Trash2 className="size-4 text-destructive" />
+              </Button>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-4">
+              <Field label="Categoria">
+                <select className={sel} value={r.category_id} onChange={(e) => updRole(i, { category_id: e.target.value })}>
+                  <option value="">Geral</option>
+                  {cats.data?.filter((c) => c.active).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
+              </Field>
+              <Field label="Quantidade"><Input type="number" min={1} max={500} value={r.positions} onChange={(e) => updRole(i, { positions: Number(e.target.value) })} /></Field>
+              <Field label="Valor por pessoa (R$)"><Input type="number" min={0} step="0.01" value={r.pay_amount} onChange={(e) => updRole(i, { pay_amount: Number(e.target.value) })} /></Field>
+              <Field label="Entrada"><Input type="time" value={r.entry_time} onChange={(e) => updRole(i, { entry_time: e.target.value })} /></Field>
+            </div>
+          </div>
+        ))}
+      </div>
       <div className="space-y-4 rounded-2xl border bg-card p-5 shadow-card">
         <div className="grid gap-4 sm:grid-cols-3">
           <Field label="Data *" error={errors.date}><Input type="date" value={f.date} onChange={set("date")} /></Field>
@@ -168,40 +203,6 @@ export function JobForm({ job }: { job?: Job | null }) {
             Após as contratações, gere a cobrança na tela Pagamentos — você receberá a chave Pix ou o boleto para transferir o valor à GiraJob.
           </p>
         )}
-      </div>
-      <div className="space-y-4 rounded-2xl border bg-card p-5 shadow-card">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <span className="text-sm font-semibold">Cargos deste evento</span>
-          <Button type="button" variant="outline" size="sm"
-            onClick={() => setRoles([...roles, { category_id: "", label: "", positions: 1, pay_amount: f.pay_amount || 0, entry_time: f.start_time }])}>
-            <Plus /> Adicionar cargo
-          </Button>
-        </div>
-        <p className="text-xs text-muted-foreground">
-          Opcional. Um mesmo evento pode ter garçom, faxineiro, segurança… cada cargo com quantidade, valor e horário de
-          entrada próprios (ex.: caixas às 13h, seguranças às 10h). Se vazio, vale o cargo principal acima.
-        </p>
-        {roles.map((r, i) => (
-          <div key={i} className="space-y-3 rounded-xl border p-3">
-            <div className="flex items-center justify-between gap-2">
-              <Input value={r.label} onChange={(e) => updRole(i, { label: e.target.value })} maxLength={80} placeholder="Nome do cargo — ex.: Segurança" className="max-w-xs" />
-              <Button type="button" variant="ghost" size="sm" onClick={() => setRoles(roles.filter((_, j) => j !== i))}>
-                <Trash2 className="size-4 text-destructive" />
-              </Button>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-4">
-              <Field label="Categoria">
-                <select className={sel} value={r.category_id} onChange={(e) => updRole(i, { category_id: e.target.value })}>
-                  <option value="">Geral</option>
-                  {cats.data?.filter((c) => c.active).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                </select>
-              </Field>
-              <Field label="Quantidade"><Input type="number" min={1} max={500} value={r.positions} onChange={(e) => updRole(i, { positions: Number(e.target.value) })} /></Field>
-              <Field label="Valor por pessoa (R$)"><Input type="number" min={0} step="0.01" value={r.pay_amount} onChange={(e) => updRole(i, { pay_amount: Number(e.target.value) })} /></Field>
-              <Field label="Entrada"><Input type="time" value={r.entry_time} onChange={(e) => updRole(i, { entry_time: e.target.value })} /></Field>
-            </div>
-          </div>
-        ))}
       </div>
       <div className="space-y-4 rounded-2xl border bg-card p-5 shadow-card">
         <Field label="Requisitos"><Textarea value={f.requirements} onChange={set("requirements")} maxLength={2000} /></Field>
