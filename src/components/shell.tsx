@@ -29,7 +29,7 @@ export function AppShell({ nav, children, badge }: { nav: NavItem[]; children: R
         {badge && <span className="mx-2 mt-1 w-fit rounded-full bg-sidebar-accent px-2 py-0.5 text-[11px] font-bold">{badge}</span>}
         <nav className="mt-6 flex flex-1 flex-col gap-1">
           {nav.map((n) => (
-            <Link key={n.to} to={n.to as never} activeOptions={{ exact: n.exact }}
+            <Link key={n.to} to={n.to as never} activeOptions={{ exact: !!n.exact }}
               className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold opacity-80 transition hover:bg-sidebar-accent hover:opacity-100"
               activeProps={{ className: "bg-sidebar-accent !opacity-100 text-sidebar-primary" }}>
               <n.icon className="size-5" /> {n.label}
@@ -49,7 +49,7 @@ export function AppShell({ nav, children, badge }: { nav: NavItem[]; children: R
       </div>
       <nav className="fixed inset-x-0 bottom-0 z-30 grid border-t bg-card md:hidden" style={{ gridTemplateColumns: `repeat(${nav.length}, minmax(0,1fr))` }}>
         {nav.map((n) => (
-          <Link key={n.to} to={n.to as never} activeOptions={{ exact: n.exact }}
+          <Link key={n.to} to={n.to as never} activeOptions={{ exact: !!n.exact }}
             className="flex flex-col items-center gap-0.5 py-2 text-[11px] font-semibold text-muted-foreground"
             activeProps={{ className: "!text-primary" }}>
             <n.icon className="size-5" /> {n.label}

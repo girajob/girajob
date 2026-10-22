@@ -20,7 +20,7 @@ function Choose() {
   async function pick(t: "professional" | "contractor") {
     setBusy(true);
     const { error } = await supabase.rpc("choose_account_type", { _type: t });
-    if (error) { setBusy(false); return toast.error(errMsg(error)); }
+    if (error) { setBusy(false); toast.error(errMsg(error)); return; }
     const me = await qc.fetchQuery({ ...meQuery, staleTime: 0 });
     navigate({ to: homeFor(me), replace: true });
   }

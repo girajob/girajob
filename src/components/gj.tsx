@@ -133,7 +133,7 @@ export function JobCard({ job, distanceKm, footer }: { job: JobCardData; distanc
   );
 }
 
-export function Field({ label, error, children, hint }: { label: string; error?: string; hint?: string; children: ReactNode }) {
+export function Field({ label, error, children, hint }: { label: string; error?: string | undefined; hint?: string | undefined; children: ReactNode }) {
   return (
     <label className="block space-y-1.5">
       <span className="text-sm font-semibold">{label}</span>
