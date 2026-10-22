@@ -80,7 +80,7 @@ function Auditoria() {
     const { error } = await supabase.rpc("set_company_blocked", {
       _company: companyId,
       _blocked: blocked,
-      _reason: blocked ? reason.trim() || "Mensalidade em atraso" : null,
+      _reason: blocked ? reason.trim() || "Mensalidade em atraso" : undefined,
     });
     setBusy(false);
     if (error) { toast.error(errMsg(error)); return; }
