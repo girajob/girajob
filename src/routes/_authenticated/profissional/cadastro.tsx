@@ -14,6 +14,7 @@ import { useMe } from "@/lib/session";
 import { categoriesQuery } from "@/lib/pro-queries";
 import { uploadMedia, useMediaUrl } from "@/lib/media";
 import { errMsg } from "@/lib/format";
+import { fetchCep } from "@/lib/br-lookup";
 import { cn } from "@/lib/utils";
 import type { Database } from "@/integrations/supabase/types";
 
