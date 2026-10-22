@@ -19,6 +19,7 @@ type Stats = {
   gross_pending: number; gross_paid: number; fees_paid: number;
   subscriptions_by_status: Record<string, number>;
   service_fee_pct: number;
+  contractor_fee_pct: number;
 };
 
 const PAY_LABEL: Record<string, string> = { pending: "Pendente", paid: "Pago", failed: "Falhou", refunded: "Reembolsado", cancelled: "Cancelado" };
