@@ -71,6 +71,13 @@
       "when": 1792696000806,
       "tag": "0009_job_roles",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1792696221327,
+      "tag": "0010_profile_pix_keys",
+      "breakpoints": true
     }
   ]
 }

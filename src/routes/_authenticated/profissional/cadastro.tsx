@@ -32,7 +32,7 @@ function Wizard() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [busy, setBusy] = useState(false);
-  const [f, setF] = useState({ full_name: "", phone: "", birth_date: "", address_line: "", postal_code: "", city: "", state: "", bio: "", skills: "", experience_years: "" });
+  const [f, setF] = useState({ full_name: "", phone: "", birth_date: "", address_line: "", postal_code: "", city: "", state: "", bio: "", skills: "", experience_years: "", pix_key_type: "", pix_key: "" });
   const [lat, setLat] = useState<number | null>(null);
   const [lng, setLng] = useState<number | null>(null);
   const [avatar, setAvatar] = useState<string | null>(null);
@@ -46,7 +46,7 @@ function Wizard() {
     if (!p) return;
     setF({ full_name: p.full_name ?? "", phone: p.phone ?? "", birth_date: p.birth_date ?? "", address_line: p.address_line ?? "",
       postal_code: p.postal_code ?? "", city: p.city ?? "", state: p.state ?? "", bio: p.bio ?? "", skills: p.skills.join(", "),
-      experience_years: p.experience_years?.toString() ?? "" });
+      experience_years: p.experience_years?.toString() ?? "", pix_key_type: p.pix_key_type ?? "", pix_key: p.pix_key ?? "" });
     setLat(p.approx_lat != null ? Number(p.approx_lat) : null);
     setLng(p.approx_lng != null ? Number(p.approx_lng) : null);
     setAvatar(p.avatar_url);
@@ -66,6 +66,7 @@ function Wizard() {
       if (!f.birth_date) return "Informe sua data de nascimento";
       const age = (Date.now() - new Date(f.birth_date).getTime()) / (365.25 * 864e5);
       if (age < 18) return "É preciso ter 18 anos ou mais";
+      if (f.pix_key.trim() && !f.pix_key_type) return "Escolha o tipo da sua chave Pix";
     }
     if (step === 2) {
       if (!f.city.trim()) return "Informe a cidade";
@@ -82,7 +83,8 @@ function Wizard() {
     setBusy(true);
     try {
       const patch: Database["public"]["Tables"]["profiles"]["Update"] = { onboarding_step: Math.min(7, step + 1) };
-      if (step === 1) Object.assign(patch, { full_name: f.full_name.trim(), phone: f.phone.trim(), birth_date: f.birth_date });
+      if (step === 1) Object.assign(patch, { full_name: f.full_name.trim(), phone: f.phone.trim(), birth_date: f.birth_date,
+        pix_key: f.pix_key.trim() || null, pix_key_type: f.pix_key.trim() ? f.pix_key_type : null });
       if (step === 2) Object.assign(patch, { address_line: f.address_line.trim() || null, postal_code: f.postal_code.trim() || null, city: f.city.trim(), state: f.state.toUpperCase(), approx_lat: lat, approx_lng: lng });
       if (step === 3) Object.assign(patch, { avatar_url: avatar });
       if (step === 4) {
@@ -149,6 +151,22 @@ function Wizard() {
           <Field label="Nome completo"><Input value={f.full_name} onChange={set("full_name")} maxLength={120} /></Field>
           <Field label="Celular"><Input value={f.phone} onChange={set("phone")} placeholder="(11) 99999-9999" maxLength={20} /></Field>
           <Field label="Data de nascimento"><Input type="date" value={f.birth_date} onChange={set("birth_date")} /></Field>
+          <div className="grid gap-4 sm:grid-cols-[180px_1fr]">
+            <Field label="Tipo de chave Pix">
+              <select value={f.pix_key_type} onChange={(e) => setF({ ...f, pix_key_type: e.target.value })}
+                className="h-10 w-full rounded-xl border border-input bg-card px-3 text-sm">
+                <option value="">Escolha…</option>
+                <option value="cpf">CPF</option>
+                <option value="cnpj">CNPJ</option>
+                <option value="email">E-mail</option>
+                <option value="phone">Telefone</option>
+                <option value="random">Chave aleatória</option>
+              </select>
+            </Field>
+            <Field label="Chave Pix" hint="Mostrada somente ao contratante que te contratar, para ele efetuar o pagamento.">
+              <Input value={f.pix_key} onChange={set("pix_key")} maxLength={120} placeholder="Sua chave Pix" />
+            </Field>
+          </div>
         </>}
         {step === 2 && <>
           <Field label="Endereço" hint="Nunca é mostrado aos contratantes."><Input value={f.address_line} onChange={set("address_line")} maxLength={200} /></Field>
