@@ -84,12 +84,20 @@ function Financeiro() {
             <StatCard label="Taxas recebidas" value={brl(s.fees_paid)} icon={BadgePercent} />
             <StatCard label="Assinaturas ativas" value={s.subscriptions_by_status["active"] ?? 0} icon={RefreshCcw} hint={`${s.subscriptions_by_status["pending"] ?? 0} pendente(s)`} />
           </div>
-          <form onSubmit={saveFee} className="flex flex-wrap items-end gap-3 rounded-2xl border bg-card p-4 shadow-card">
-            <Field label="Taxa da plataforma sobre serviços (%)" hint={`Atual: ${s.service_fee_pct}% — aplicada nas próximas listas de pagamento geradas`}>
-              <Input value={fee} onChange={(e) => setFee(e.target.value)} placeholder={String(s.service_fee_pct)} className="w-32" inputMode="decimal" />
-            </Field>
-            <Button variant="cta" disabled={!fee.trim()}>Salvar taxa</Button>
-          </form>
+          <div className="grid gap-3 md:grid-cols-2">
+            <form onSubmit={(e) => { e.preventDefault(); saveFee("service_fee_pct", fee, () => setFee("")); }} className="flex flex-wrap items-end gap-3 rounded-2xl border bg-card p-4 shadow-card">
+              <Field label="Taxa sobre o profissional (%)" hint={`Atual: ${s.service_fee_pct}% — descontada do valor que o profissional recebe`}>
+                <Input value={fee} onChange={(e) => setFee(e.target.value)} placeholder={String(s.service_fee_pct)} className="w-32" inputMode="decimal" />
+              </Field>
+              <Button variant="cta" disabled={!fee.trim()}>Salvar</Button>
+            </form>
+            <form onSubmit={(e) => { e.preventDefault(); saveFee("contractor_fee_pct", conFee, () => setConFee("")); }} className="flex flex-wrap items-end gap-3 rounded-2xl border bg-card p-4 shadow-card">
+              <Field label="Taxa sobre o contratante (%)" hint={`Atual: ${s.contractor_fee_pct}% — somada ao valor cobrado da empresa`}>
+                <Input value={conFee} onChange={(e) => setConFee(e.target.value)} placeholder={String(s.contractor_fee_pct)} className="w-32" inputMode="decimal" />
+              </Field>
+              <Button variant="cta" disabled={!conFee.trim()}>Salvar</Button>
+            </form>
+          </div>
         </>
       )}
       <section>

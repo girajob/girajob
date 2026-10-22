@@ -19,6 +19,7 @@ type Row = {
   booking_id: string; professional_name: string; booking_status: string;
   checked_in_at: string | null; gross: number; payment_id: string | null;
   payment_status: string | null; fee: number | null; net: number | null;
+  pro_fee: number | null; contractor_fee: number | null; total_charge: number | null;
 };
 
 const PAY_LABEL: Record<string, string> = { pending: "Pendente", paid: "Pago", failed: "Falhou", refunded: "Reembolsado", cancelled: "Cancelado" };
