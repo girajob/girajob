@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { CalendarDays, Clock, MapPin, Tag, Loader2, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 import { brl, fmtDate, fmtTime } from "@/lib/format";
 import { JOB_STATUS_LABEL, APP_STATUS_LABEL } from "@/lib/jobs";
 import { useMediaUrl } from "@/lib/media";
@@ -107,7 +108,8 @@ export function JobCard({ job, distanceKm, footer }: { job: JobCardData; distanc
   const banner = useMediaUrl(job.banner_url);
   return (
     <article className="animate-rise overflow-hidden rounded-2xl border bg-card shadow-card transition hover:-translate-y-0.5">
-      <Link to="/profissional/vagas/$id" params={{ id: job.id }} className="block">
+      <Link to="/profissional/vagas/$id" params={{ id: job.id }} className="block"
+        onClick={() => { if (job.id !== "preview") void supabase.rpc("track_job_event", { _job: job.id, _type: "click" }); }}>
         <div className="relative h-28 bg-hero">
           {banner && <img src={banner} alt="" className="absolute inset-0 size-full object-cover" />}
           <div className="absolute left-3 top-3"><StatusPill status={job.status} /></div>
