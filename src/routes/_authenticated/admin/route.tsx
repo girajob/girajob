@@ -14,6 +14,8 @@ export const Route = createFileRoute("/_authenticated/admin")({
       { to: "/admin", label: "Painel", icon: LayoutDashboard, exact: true },
       { to: "/admin/usuarios", label: "Usuários", icon: Users },
       { to: "/admin/categorias", label: "Categorias", icon: Tags },
+      { to: "/admin/financeiro", label: "Financeiro", icon: CircleDollarSign },
+      { to: "/admin/auditoria", label: "Auditoria", icon: ScrollText },
     ]}>
       <Outlet />
     </AppShell>
