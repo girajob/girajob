@@ -19,6 +19,7 @@ type Row = {
   booking_id: string; professional_name: string; booking_status: string;
   checked_in_at: string | null; gross: number; payment_id: string | null;
   payment_status: string | null; fee: number | null; net: number | null;
+  pro_fee: number | null; contractor_fee: number | null; total_charge: number | null;
 };
 
 const PAY_LABEL: Record<string, string> = { pending: "Pendente", paid: "Pago", failed: "Falhou", refunded: "Reembolsado", cancelled: "Cancelado" };
@@ -56,6 +57,7 @@ function Payments() {
   const pendingCheckin = rows.filter((r) => !r.checked_in_at).length;
   const totalGross = rows.filter((r) => r.payment_id).reduce((s, r) => s + Number(r.gross), 0);
   const totalNet = rows.filter((r) => r.payment_id).reduce((s, r) => s + Number(r.net ?? 0), 0);
+  const totalCharge = rows.filter((r) => r.payment_id).reduce((s, r) => s + Number(r.total_charge ?? r.gross), 0);
 
   return (
     <div className="space-y-6">
@@ -109,7 +111,7 @@ function Payments() {
                         <div className="font-display text-lg font-extrabold">{brl(r.gross)}</div>
                         {r.payment_id ? (
                           <div className="text-xs text-muted-foreground">
-                            taxa {brl(r.fee ?? 0)} · líquido {brl(r.net ?? 0)}{" "}
+                            profissional recebe {brl(r.net ?? 0)} (taxa {brl(r.pro_fee ?? 0)}) · sua taxa {brl(r.contractor_fee ?? 0)} · <strong>total a pagar {brl(r.total_charge ?? r.gross)}</strong>{" "}
                             <StatusPill status={r.payment_status ?? "pending"} label={PAY_LABEL[r.payment_status ?? "pending"]} />
                           </div>
                         ) : (
@@ -121,7 +123,7 @@ function Payments() {
                   {totalGross > 0 && (
                     <div className="flex flex-wrap justify-between gap-2 rounded-2xl bg-primary-soft p-4 text-primary">
                       <span className="font-bold">Total da lista</span>
-                      <span className="font-display font-extrabold">{brl(totalGross)} bruto · {brl(totalNet)} líquido</span>
+                      <span className="font-display font-extrabold">{brl(totalCharge)} a pagar · {brl(totalNet)} aos profissionais</span>
                     </div>
                   )}
                 </div>

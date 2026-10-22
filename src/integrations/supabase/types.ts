@@ -386,6 +386,7 @@ export type Database = {
         Row: {
           booking_id: string | null
           company_id: string
+          contractor_fee_amount: number
           created_at: string
           fee_amount: number
           gross_amount: number
@@ -394,16 +395,19 @@ export type Database = {
           kind: string
           method: string | null
           net_amount: number
+          pro_fee_amount: number
           provider: string | null
           provider_ref: string | null
           reconciled_at: string | null
           status: string
           subscription_id: string | null
+          total_charge: number
           updated_at: string
         }
         Insert: {
           booking_id?: string | null
           company_id: string
+          contractor_fee_amount?: number
           created_at?: string
           fee_amount?: number
           gross_amount?: number
@@ -412,16 +416,19 @@ export type Database = {
           kind: string
           method?: string | null
           net_amount?: number
+          pro_fee_amount?: number
           provider?: string | null
           provider_ref?: string | null
           reconciled_at?: string | null
           status?: string
           subscription_id?: string | null
+          total_charge?: number
           updated_at?: string
         }
         Update: {
           booking_id?: string | null
           company_id?: string
+          contractor_fee_amount?: number
           created_at?: string
           fee_amount?: number
           gross_amount?: number
@@ -430,11 +437,13 @@ export type Database = {
           kind?: string
           method?: string | null
           net_amount?: number
+          pro_fee_amount?: number
           provider?: string | null
           provider_ref?: string | null
           reconciled_at?: string | null
           status?: string
           subscription_id?: string | null
+          total_charge?: number
           updated_at?: string
         }
         Relationships: [
@@ -783,6 +792,10 @@ export type Database = {
           status: Database["public"]["Enums"]["profile_status"]
         }[]
       }
+      admin_revenue_report: {
+        Args: { _from?: string; _to?: string }
+        Returns: Json
+      }
       admin_set_profile_status: {
         Args: {
           _status: Database["public"]["Enums"]["profile_status"]
@@ -814,6 +827,7 @@ export type Database = {
         Returns: undefined
       }
       confirm_hire: { Args: { _app: string }; Returns: string }
+      contractor_fee_pct: { Args: never; Returns: number }
       generate_payment_list: { Args: { _job: string }; Returns: number }
       get_booking_qr: { Args: { _booking: string }; Returns: string }
       has_role: {
@@ -847,12 +861,15 @@ export type Database = {
           booking_id: string
           booking_status: Database["public"]["Enums"]["booking_status"]
           checked_in_at: string
+          contractor_fee: number
           fee: number
           gross: number
           net: number
           payment_id: string
           payment_status: string
+          pro_fee: number
           professional_name: string
+          total_charge: number
         }[]
       }
       notify: {
