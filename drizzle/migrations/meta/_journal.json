@@ -50,6 +50,13 @@
       "when": 1792695278818,
       "tag": "0006_add_seller_role",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792695384568,
+      "tag": "0007_pricing_blocking_payouts",
+      "breakpoints": true
     }
   ]
 }
