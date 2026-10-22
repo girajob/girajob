@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { CalendarDays, Clock, MapPin, Tag, Loader2, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 import { brl, fmtDate, fmtTime } from "@/lib/format";
 import { JOB_STATUS_LABEL, APP_STATUS_LABEL } from "@/lib/jobs";
 import { useMediaUrl } from "@/lib/media";
@@ -33,7 +34,7 @@ const tone: Record<string, string> = {
   blocked: "bg-destructive-soft text-destructive",
 };
 
-export function StatusPill({ status, label }: { status: string; label?: string }) {
+export function StatusPill({ status, label }: { status: string; label?: string | undefined }) {
   return (
     <span className={cn("inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold", tone[status] ?? "bg-muted")}>
       {label ?? JOB_STATUS_LABEL[status] ?? APP_STATUS_LABEL[status] ?? status}
@@ -41,7 +42,7 @@ export function StatusPill({ status, label }: { status: string; label?: string }
   );
 }
 
-export function Spinner({ label = "Carregando…" }: { label?: string }) {
+export function Spinner({ label = "Carregando…" }: { label?: string | undefined }) {
   return (
     <div className="flex items-center justify-center gap-2 py-16 text-muted-foreground" role="status">
       <Loader2 className="size-5 animate-spin" /> {label}
@@ -107,7 +108,8 @@ export function JobCard({ job, distanceKm, footer }: { job: JobCardData; distanc
   const banner = useMediaUrl(job.banner_url);
   return (
     <article className="animate-rise overflow-hidden rounded-2xl border bg-card shadow-card transition hover:-translate-y-0.5">
-      <Link to="/profissional/vagas/$id" params={{ id: job.id }} className="block">
+      <Link to="/profissional/vagas/$id" params={{ id: job.id }} className="block"
+        onClick={() => { if (job.id !== "preview") void supabase.rpc("track_job_event", { _job: job.id, _type: "click" }); }}>
         <div className="relative h-28 bg-hero">
           {banner && <img src={banner} alt="" className="absolute inset-0 size-full object-cover" />}
           <div className="absolute left-3 top-3"><StatusPill status={job.status} /></div>

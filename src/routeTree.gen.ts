@@ -13,19 +13,28 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
+import { Route as AuthenticatedContratanteRouteRouteImport } from './routes/_authenticated/contratante/route'
 import { Route as AuthenticatedEscolherPerfilRouteImport } from './routes/_authenticated/escolher-perfil'
 import { Route as AuthenticatedInicioRouteImport } from './routes/_authenticated/inicio'
 import { Route as AuthenticatedProfissionalRouteRouteImport } from './routes/_authenticated/profissional/route'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as AuthenticatedAdminCategoriasRouteImport } from './routes/_authenticated/admin/categorias'
+import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin/usuarios'
 import { Route as AuthenticatedContratanteIndexRouteImport } from './routes/_authenticated/contratante/index'
 import { Route as AuthenticatedContratanteEmpresaRouteImport } from './routes/_authenticated/contratante/empresa'
+import { Route as AuthenticatedContratanteQrRouteImport } from './routes/_authenticated/contratante/qr'
 import { Route as AuthenticatedProfissionalIndexRouteImport } from './routes/_authenticated/profissional/index'
 import { Route as AuthenticatedProfissionalAgendaRouteImport } from './routes/_authenticated/profissional/agenda'
 import { Route as AuthenticatedProfissionalCadastroRouteImport } from './routes/_authenticated/profissional/cadastro'
 import { Route as AuthenticatedProfissionalCandidaturasRouteImport } from './routes/_authenticated/profissional/candidaturas'
 import { Route as AuthenticatedProfissionalExplorarRouteImport } from './routes/_authenticated/profissional/explorar'
 import { Route as AuthenticatedProfissionalPerfilRouteImport } from './routes/_authenticated/profissional/perfil'
+import { Route as AuthenticatedContratanteVagasIndexRouteImport } from './routes/_authenticated/contratante/vagas.index'
+import { Route as AuthenticatedContratanteVagasIdRouteImport } from './routes/_authenticated/contratante/vagas.$id'
+import { Route as AuthenticatedContratanteVagasNovaRouteImport } from './routes/_authenticated/contratante/vagas.nova'
 import { Route as AuthenticatedProfissionalVagasIdRouteImport } from './routes/_authenticated/profissional/vagas.$id'
+import { Route as AuthenticatedContratanteVagasIdEditarRouteImport } from './routes/_authenticated/contratante/vagas.$id_.editar'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -46,6 +55,17 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedContratanteRouteRoute =
+  AuthenticatedContratanteRouteRouteImport.update({
+    id: '/contratante',
+    path: '/contratante',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedEscolherPerfilRoute =
   AuthenticatedEscolherPerfilRouteImport.update({
     id: '/escolher-perfil',
@@ -64,21 +84,39 @@ const AuthenticatedProfissionalRouteRoute =
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
-  id: '/admin/',
-  path: '/admin/',
-  getParentRoute: () => AuthenticatedRouteRoute,
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
+const AuthenticatedAdminCategoriasRoute =
+  AuthenticatedAdminCategoriasRouteImport.update({
+    id: '/categorias',
+    path: '/categorias',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminUsuariosRoute =
+  AuthenticatedAdminUsuariosRouteImport.update({
+    id: '/usuarios',
+    path: '/usuarios',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedContratanteIndexRoute =
   AuthenticatedContratanteIndexRouteImport.update({
-    id: '/contratante/',
-    path: '/contratante/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedContratanteRouteRoute,
   } as any)
 const AuthenticatedContratanteEmpresaRoute =
   AuthenticatedContratanteEmpresaRouteImport.update({
-    id: '/contratante/empresa',
-    path: '/contratante/empresa',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/empresa',
+    path: '/empresa',
+    getParentRoute: () => AuthenticatedContratanteRouteRoute,
+  } as any)
+const AuthenticatedContratanteQrRoute =
+  AuthenticatedContratanteQrRouteImport.update({
+    id: '/qr',
+    path: '/qr',
+    getParentRoute: () => AuthenticatedContratanteRouteRoute,
   } as any)
 const AuthenticatedProfissionalIndexRoute =
   AuthenticatedProfissionalIndexRouteImport.update({
@@ -116,21 +154,50 @@ const AuthenticatedProfissionalPerfilRoute =
     path: '/perfil',
     getParentRoute: () => AuthenticatedProfissionalRouteRoute,
   } as any)
+const AuthenticatedContratanteVagasIndexRoute =
+  AuthenticatedContratanteVagasIndexRouteImport.update({
+    id: '/vagas/',
+    path: '/vagas/',
+    getParentRoute: () => AuthenticatedContratanteRouteRoute,
+  } as any)
+const AuthenticatedContratanteVagasIdRoute =
+  AuthenticatedContratanteVagasIdRouteImport.update({
+    id: '/vagas/$id',
+    path: '/vagas/$id',
+    getParentRoute: () => AuthenticatedContratanteRouteRoute,
+  } as any)
+const AuthenticatedContratanteVagasNovaRoute =
+  AuthenticatedContratanteVagasNovaRouteImport.update({
+    id: '/vagas/nova',
+    path: '/vagas/nova',
+    getParentRoute: () => AuthenticatedContratanteRouteRoute,
+  } as any)
 const AuthenticatedProfissionalVagasIdRoute =
   AuthenticatedProfissionalVagasIdRouteImport.update({
     id: '/vagas/$id',
     path: '/vagas/$id',
     getParentRoute: () => AuthenticatedProfissionalRouteRoute,
   } as any)
+const AuthenticatedContratanteVagasIdEditarRoute =
+  AuthenticatedContratanteVagasIdEditarRouteImport.update({
+    id: '/vagas/$id_/editar',
+    path: '/vagas/$id/editar',
+    getParentRoute: () => AuthenticatedContratanteRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/contratante': typeof AuthenticatedContratanteRouteRouteWithChildren
   '/profissional': typeof AuthenticatedProfissionalRouteRouteWithChildren
   '/escolher-perfil': typeof AuthenticatedEscolherPerfilRoute
   '/inicio': typeof AuthenticatedInicioRoute
+  '/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
+  '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/contratante/empresa': typeof AuthenticatedContratanteEmpresaRoute
+  '/contratante/qr': typeof AuthenticatedContratanteQrRoute
   '/profissional/agenda': typeof AuthenticatedProfissionalAgendaRoute
   '/profissional/cadastro': typeof AuthenticatedProfissionalCadastroRoute
   '/profissional/candidaturas': typeof AuthenticatedProfissionalCandidaturasRoute
@@ -139,7 +206,11 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/contratante/': typeof AuthenticatedContratanteIndexRoute
   '/profissional/': typeof AuthenticatedProfissionalIndexRoute
+  '/contratante/vagas/$id': typeof AuthenticatedContratanteVagasIdRoute
+  '/contratante/vagas/nova': typeof AuthenticatedContratanteVagasNovaRoute
   '/profissional/vagas/$id': typeof AuthenticatedProfissionalVagasIdRoute
+  '/contratante/vagas/': typeof AuthenticatedContratanteVagasIndexRoute
+  '/contratante/vagas/$id/editar': typeof AuthenticatedContratanteVagasIdEditarRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -147,7 +218,10 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/escolher-perfil': typeof AuthenticatedEscolherPerfilRoute
   '/inicio': typeof AuthenticatedInicioRoute
+  '/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
+  '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/contratante/empresa': typeof AuthenticatedContratanteEmpresaRoute
+  '/contratante/qr': typeof AuthenticatedContratanteQrRoute
   '/profissional/agenda': typeof AuthenticatedProfissionalAgendaRoute
   '/profissional/cadastro': typeof AuthenticatedProfissionalCadastroRoute
   '/profissional/candidaturas': typeof AuthenticatedProfissionalCandidaturasRoute
@@ -156,7 +230,11 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/contratante': typeof AuthenticatedContratanteIndexRoute
   '/profissional': typeof AuthenticatedProfissionalIndexRoute
+  '/contratante/vagas/$id': typeof AuthenticatedContratanteVagasIdRoute
+  '/contratante/vagas/nova': typeof AuthenticatedContratanteVagasNovaRoute
   '/profissional/vagas/$id': typeof AuthenticatedProfissionalVagasIdRoute
+  '/contratante/vagas': typeof AuthenticatedContratanteVagasIndexRoute
+  '/contratante/vagas/$id/editar': typeof AuthenticatedContratanteVagasIdEditarRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -164,10 +242,15 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/_authenticated/contratante': typeof AuthenticatedContratanteRouteRouteWithChildren
   '/_authenticated/profissional': typeof AuthenticatedProfissionalRouteRouteWithChildren
   '/_authenticated/escolher-perfil': typeof AuthenticatedEscolherPerfilRoute
   '/_authenticated/inicio': typeof AuthenticatedInicioRoute
+  '/_authenticated/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
+  '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/_authenticated/contratante/empresa': typeof AuthenticatedContratanteEmpresaRoute
+  '/_authenticated/contratante/qr': typeof AuthenticatedContratanteQrRoute
   '/_authenticated/profissional/agenda': typeof AuthenticatedProfissionalAgendaRoute
   '/_authenticated/profissional/cadastro': typeof AuthenticatedProfissionalCadastroRoute
   '/_authenticated/profissional/candidaturas': typeof AuthenticatedProfissionalCandidaturasRoute
@@ -176,7 +259,11 @@ export interface FileRoutesById {
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/contratante/': typeof AuthenticatedContratanteIndexRoute
   '/_authenticated/profissional/': typeof AuthenticatedProfissionalIndexRoute
+  '/_authenticated/contratante/vagas/$id': typeof AuthenticatedContratanteVagasIdRoute
+  '/_authenticated/contratante/vagas/nova': typeof AuthenticatedContratanteVagasNovaRoute
   '/_authenticated/profissional/vagas/$id': typeof AuthenticatedProfissionalVagasIdRoute
+  '/_authenticated/contratante/vagas/': typeof AuthenticatedContratanteVagasIndexRoute
+  '/_authenticated/contratante/vagas/$id_/editar': typeof AuthenticatedContratanteVagasIdEditarRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -184,10 +271,15 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/reset-password'
+    | '/admin'
+    | '/contratante'
     | '/profissional'
     | '/escolher-perfil'
     | '/inicio'
+    | '/admin/categorias'
+    | '/admin/usuarios'
     | '/contratante/empresa'
+    | '/contratante/qr'
     | '/profissional/agenda'
     | '/profissional/cadastro'
     | '/profissional/candidaturas'
@@ -196,7 +288,11 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/contratante/'
     | '/profissional/'
+    | '/contratante/vagas/$id'
+    | '/contratante/vagas/nova'
     | '/profissional/vagas/$id'
+    | '/contratante/vagas/'
+    | '/contratante/vagas/$id/editar'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -204,7 +300,10 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/escolher-perfil'
     | '/inicio'
+    | '/admin/categorias'
+    | '/admin/usuarios'
     | '/contratante/empresa'
+    | '/contratante/qr'
     | '/profissional/agenda'
     | '/profissional/cadastro'
     | '/profissional/candidaturas'
@@ -213,17 +312,26 @@ export interface FileRouteTypes {
     | '/admin'
     | '/contratante'
     | '/profissional'
+    | '/contratante/vagas/$id'
+    | '/contratante/vagas/nova'
     | '/profissional/vagas/$id'
+    | '/contratante/vagas'
+    | '/contratante/vagas/$id/editar'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/reset-password'
+    | '/_authenticated/admin'
+    | '/_authenticated/contratante'
     | '/_authenticated/profissional'
     | '/_authenticated/escolher-perfil'
     | '/_authenticated/inicio'
+    | '/_authenticated/admin/categorias'
+    | '/_authenticated/admin/usuarios'
     | '/_authenticated/contratante/empresa'
+    | '/_authenticated/contratante/qr'
     | '/_authenticated/profissional/agenda'
     | '/_authenticated/profissional/cadastro'
     | '/_authenticated/profissional/candidaturas'
@@ -232,7 +340,11 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/'
     | '/_authenticated/contratante/'
     | '/_authenticated/profissional/'
+    | '/_authenticated/contratante/vagas/$id'
+    | '/_authenticated/contratante/vagas/nova'
     | '/_authenticated/profissional/vagas/$id'
+    | '/_authenticated/contratante/vagas/'
+    | '/_authenticated/contratante/vagas/$id_/editar'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -272,6 +384,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/contratante': {
+      id: '/_authenticated/contratante'
+      path: '/contratante'
+      fullPath: '/contratante'
+      preLoaderRoute: typeof AuthenticatedContratanteRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/escolher-perfil': {
       id: '/_authenticated/escolher-perfil'
       path: '/escolher-perfil'
@@ -295,24 +421,45 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
-      path: '/admin'
+      path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/categorias': {
+      id: '/_authenticated/admin/categorias'
+      path: '/categorias'
+      fullPath: '/admin/categorias'
+      preLoaderRoute: typeof AuthenticatedAdminCategoriasRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/usuarios': {
+      id: '/_authenticated/admin/usuarios'
+      path: '/usuarios'
+      fullPath: '/admin/usuarios'
+      preLoaderRoute: typeof AuthenticatedAdminUsuariosRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/contratante/': {
       id: '/_authenticated/contratante/'
-      path: '/contratante'
+      path: '/'
       fullPath: '/contratante/'
       preLoaderRoute: typeof AuthenticatedContratanteIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedContratanteRouteRoute
     }
     '/_authenticated/contratante/empresa': {
       id: '/_authenticated/contratante/empresa'
-      path: '/contratante/empresa'
+      path: '/empresa'
       fullPath: '/contratante/empresa'
       preLoaderRoute: typeof AuthenticatedContratanteEmpresaRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedContratanteRouteRoute
+    }
+    '/_authenticated/contratante/qr': {
+      id: '/_authenticated/contratante/qr'
+      path: '/qr'
+      fullPath: '/contratante/qr'
+      preLoaderRoute: typeof AuthenticatedContratanteQrRouteImport
+      parentRoute: typeof AuthenticatedContratanteRouteRoute
     }
     '/_authenticated/profissional/': {
       id: '/_authenticated/profissional/'
@@ -356,6 +503,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfissionalPerfilRouteImport
       parentRoute: typeof AuthenticatedProfissionalRouteRoute
     }
+    '/_authenticated/contratante/vagas/': {
+      id: '/_authenticated/contratante/vagas/'
+      path: '/vagas'
+      fullPath: '/contratante/vagas/'
+      preLoaderRoute: typeof AuthenticatedContratanteVagasIndexRouteImport
+      parentRoute: typeof AuthenticatedContratanteRouteRoute
+    }
+    '/_authenticated/contratante/vagas/$id': {
+      id: '/_authenticated/contratante/vagas/$id'
+      path: '/vagas/$id'
+      fullPath: '/contratante/vagas/$id'
+      preLoaderRoute: typeof AuthenticatedContratanteVagasIdRouteImport
+      parentRoute: typeof AuthenticatedContratanteRouteRoute
+    }
+    '/_authenticated/contratante/vagas/nova': {
+      id: '/_authenticated/contratante/vagas/nova'
+      path: '/vagas/nova'
+      fullPath: '/contratante/vagas/nova'
+      preLoaderRoute: typeof AuthenticatedContratanteVagasNovaRouteImport
+      parentRoute: typeof AuthenticatedContratanteRouteRoute
+    }
     '/_authenticated/profissional/vagas/$id': {
       id: '/_authenticated/profissional/vagas/$id'
       path: '/vagas/$id'
@@ -363,8 +531,62 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfissionalVagasIdRouteImport
       parentRoute: typeof AuthenticatedProfissionalRouteRoute
     }
+    '/_authenticated/contratante/vagas/$id_/editar': {
+      id: '/_authenticated/contratante/vagas/$id_/editar'
+      path: '/vagas/$id/editar'
+      fullPath: '/contratante/vagas/$id/editar'
+      preLoaderRoute: typeof AuthenticatedContratanteVagasIdEditarRouteImport
+      parentRoute: typeof AuthenticatedContratanteRouteRoute
+    }
   }
 }
+
+interface AuthenticatedAdminRouteRouteChildren {
+  AuthenticatedAdminCategoriasRoute: typeof AuthenticatedAdminCategoriasRoute
+  AuthenticatedAdminUsuariosRoute: typeof AuthenticatedAdminUsuariosRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+}
+
+const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
+  {
+    AuthenticatedAdminCategoriasRoute: AuthenticatedAdminCategoriasRoute,
+    AuthenticatedAdminUsuariosRoute: AuthenticatedAdminUsuariosRoute,
+    AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  }
+
+const AuthenticatedAdminRouteRouteWithChildren =
+  AuthenticatedAdminRouteRoute._addFileChildren(
+    AuthenticatedAdminRouteRouteChildren,
+  )
+
+interface AuthenticatedContratanteRouteRouteChildren {
+  AuthenticatedContratanteEmpresaRoute: typeof AuthenticatedContratanteEmpresaRoute
+  AuthenticatedContratanteQrRoute: typeof AuthenticatedContratanteQrRoute
+  AuthenticatedContratanteIndexRoute: typeof AuthenticatedContratanteIndexRoute
+  AuthenticatedContratanteVagasIdRoute: typeof AuthenticatedContratanteVagasIdRoute
+  AuthenticatedContratanteVagasNovaRoute: typeof AuthenticatedContratanteVagasNovaRoute
+  AuthenticatedContratanteVagasIndexRoute: typeof AuthenticatedContratanteVagasIndexRoute
+  AuthenticatedContratanteVagasIdEditarRoute: typeof AuthenticatedContratanteVagasIdEditarRoute
+}
+
+const AuthenticatedContratanteRouteRouteChildren: AuthenticatedContratanteRouteRouteChildren =
+  {
+    AuthenticatedContratanteEmpresaRoute: AuthenticatedContratanteEmpresaRoute,
+    AuthenticatedContratanteQrRoute: AuthenticatedContratanteQrRoute,
+    AuthenticatedContratanteIndexRoute: AuthenticatedContratanteIndexRoute,
+    AuthenticatedContratanteVagasIdRoute: AuthenticatedContratanteVagasIdRoute,
+    AuthenticatedContratanteVagasNovaRoute:
+      AuthenticatedContratanteVagasNovaRoute,
+    AuthenticatedContratanteVagasIndexRoute:
+      AuthenticatedContratanteVagasIndexRoute,
+    AuthenticatedContratanteVagasIdEditarRoute:
+      AuthenticatedContratanteVagasIdEditarRoute,
+  }
+
+const AuthenticatedContratanteRouteRouteWithChildren =
+  AuthenticatedContratanteRouteRoute._addFileChildren(
+    AuthenticatedContratanteRouteRouteChildren,
+  )
 
 interface AuthenticatedProfissionalRouteRouteChildren {
   AuthenticatedProfissionalAgendaRoute: typeof AuthenticatedProfissionalAgendaRoute
@@ -397,22 +619,21 @@ const AuthenticatedProfissionalRouteRouteWithChildren =
   )
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
+  AuthenticatedContratanteRouteRoute: typeof AuthenticatedContratanteRouteRouteWithChildren
   AuthenticatedProfissionalRouteRoute: typeof AuthenticatedProfissionalRouteRouteWithChildren
   AuthenticatedEscolherPerfilRoute: typeof AuthenticatedEscolherPerfilRoute
   AuthenticatedInicioRoute: typeof AuthenticatedInicioRoute
-  AuthenticatedContratanteEmpresaRoute: typeof AuthenticatedContratanteEmpresaRoute
-  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
-  AuthenticatedContratanteIndexRoute: typeof AuthenticatedContratanteIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
+  AuthenticatedContratanteRouteRoute:
+    AuthenticatedContratanteRouteRouteWithChildren,
   AuthenticatedProfissionalRouteRoute:
     AuthenticatedProfissionalRouteRouteWithChildren,
   AuthenticatedEscolherPerfilRoute: AuthenticatedEscolherPerfilRoute,
   AuthenticatedInicioRoute: AuthenticatedInicioRoute,
-  AuthenticatedContratanteEmpresaRoute: AuthenticatedContratanteEmpresaRoute,
-  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
-  AuthenticatedContratanteIndexRoute: AuthenticatedContratanteIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
