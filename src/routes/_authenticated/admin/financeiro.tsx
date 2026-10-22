@@ -148,7 +148,7 @@ function Financeiro() {
                 {payments.data.map((p) => (
                   <tr key={p.id} className="border-t">
                     <td className="p-3 font-semibold">{p.companies?.name ?? "—"}</td>
-                    <td className="p-3">{p.kind === "service" ? "Serviço" : "Assinatura"}</td>
+                    <td className="p-3">{p.kind === "service" ? "Serviço" : p.kind === "payout_deposit" ? "Repasse GiraJob" : "Assinatura"}</td>
                     <td className="p-3">{brl(p.gross_amount)}</td>
                     <td className="p-3">{brl(p.fee_amount)}</td>
                     <td className="p-3">{brl(p.net_amount)}</td>
