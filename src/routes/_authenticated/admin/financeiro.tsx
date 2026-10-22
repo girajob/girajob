@@ -62,14 +62,13 @@ function Financeiro() {
     },
   });
 
-  async function saveFee(e: React.FormEvent) {
-    e.preventDefault();
-    const pct = Number(fee.replace(",", "."));
+  async function saveFee(key: "service_fee_pct" | "contractor_fee_pct", raw: string, clear: () => void) {
+    const pct = Number(raw.replace(",", "."));
     if (!Number.isFinite(pct) || pct < 0 || pct > 100) { toast.error("Informe um percentual entre 0 e 100"); return; }
-    const { error } = await supabase.rpc("set_platform_setting", { _key: "service_fee_pct", _value: pct });
+    const { error } = await supabase.rpc("set_platform_setting", { _key: key, _value: pct });
     if (error) { toast.error(errMsg(error)); return; }
     toast.success("Taxa atualizada");
-    setFee("");
+    clear();
     qc.invalidateQueries({ queryKey: ["admin-fin"] });
   }
 
