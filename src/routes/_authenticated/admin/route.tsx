@@ -1,0 +1,21 @@
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { LayoutDashboard, Tags, Users } from "lucide-react";
+import { AppShell } from "@/components/shell";
+import { meQuery } from "@/lib/session";
+
+export const Route = createFileRoute("/_authenticated/admin")({
+  beforeLoad: async ({ context }) => {
+    const me = await context.queryClient.ensureQueryData(meQuery);
+    // UI gate only; every admin read/write is re-checked in the database.
+    if (!me?.roles.includes("admin")) throw redirect({ to: "/inicio" });
+  },
+  component: () => (
+    <AppShell badge="Administrador" nav={[
+      { to: "/admin", label: "Painel", icon: LayoutDashboard, exact: true },
+      { to: "/admin/usuarios", label: "Usuários", icon: Users },
+      { to: "/admin/categorias", label: "Categorias", icon: Tags },
+    ]}>
+      <Outlet />
+    </AppShell>
+  ),
+});
