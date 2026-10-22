@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ImagePlus, Moon, Plus, Trash2 } from "lucide-react";
+import { ImagePlus, Moon, Plus, Tags, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,13 +11,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Field, JobCard } from "@/components/gj";
 import { categoriesQuery } from "@/lib/pro-queries";
 import { buildShift, validateJob, type JobFormInput } from "@/lib/jobs";
-import { errMsg, toDateInput, toTimeInput } from "@/lib/format";
+import { brl, errMsg, toDateInput, toTimeInput } from "@/lib/format";
+import { priceCatalogQuery } from "@/lib/price-catalog";
+import { roleFromCatalog, staffingTotals, type StaffRole } from "@/lib/staffing";
 import { uploadMedia } from "@/lib/media";
 import { useMe } from "@/lib/session";
 import type { Database } from "@/integrations/supabase/types";
 
 type Job = Database["public"]["Tables"]["jobs"]["Row"];
-type RoleInput = { category_id: string; label: string; positions: number; pay_amount: number; entry_time: string };
+type RoleInput = StaffRole;
 const sel = "h-10 w-full rounded-xl border border-input bg-card px-3 text-sm";
 
 function fromJob(j?: Job | null): JobFormInput {
@@ -36,6 +38,9 @@ function fromJob(j?: Job | null): JobFormInput {
 export function JobForm({ job }: { job?: Job | null }) {
   const { data: me } = useMe();
   const cats = useQuery(categoriesQuery);
+  const catalog = useQuery(priceCatalogQuery(me?.company?.id));
+  const [catalogOpen, setCatalogOpen] = useState(false);
+  const [quantities, setQuantities] = useState<Record<string, number>>({});
   const qc = useQueryClient();
   const navigate = useNavigate();
   const [f, setF] = useState<JobFormInput>(fromJob(job));
@@ -46,7 +51,8 @@ export function JobForm({ job }: { job?: Job | null }) {
     queryKey: ["job-roles", job?.id],
     enabled: !!job?.id,
     queryFn: async () => {
-      const { data, error } = await supabase.from("job_roles").select("*").eq("job_id", job!.id).order("created_at");
+      if (!job) return [];
+      const { data, error } = await supabase.from("job_roles").select("*").eq("job_id", job.id).order("created_at");
       if (error) throw error;
       return data;
     },
@@ -68,6 +74,22 @@ export function JobForm({ job }: { job?: Job | null }) {
     setF({ ...f, [k]: k === "positions" || k === "pay_amount" ? Number(e.target.value) : e.target.value });
   const shift = f.date && f.start_time && f.end_time ? buildShift(f.date, f.start_time, f.end_time) : null;
   const editingLive = job && job.status !== "draft";
+  const totals = staffingTotals(roles);
+  const eventForm = roles.length ? { ...f, positions: totals.positions } : f;
+  const activeItems = catalog.data?.filter((item) => item.active) ?? [];
+
+  function addCatalogRoles() {
+    const selected = activeItems.filter((item) => (quantities[item.id] ?? 0) > 0);
+    if (!selected.length) return;
+    if (selected.some((item) => !Number.isInteger(quantities[item.id]) || (quantities[item.id] ?? 0) > 500)) {
+      toast.error("Informe quantidades inteiras entre 1 e 500"); return;
+    }
+    const newRoles = selected.map((item) => roleFromCatalog(item, quantities[item.id] ?? 1, f.start_time, cats.data?.filter((c) => c.active) ?? []));
+    setRoles([...roles, ...newRoles]);
+    const first = newRoles[0];
+    if (!roles.length && first) setF({ ...f, category_id: f.category_id || first.category_id, pay_amount: f.pay_amount || first.pay_amount });
+    setCatalogOpen(false); setQuantities({});
+  }
 
   async function onBanner(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -77,13 +99,17 @@ export function JobForm({ job }: { job?: Job | null }) {
   }
 
   async function save(publish: boolean) {
-    const errs = validateJob(f, { publishing: publish || !!editingLive });
+    if (!me?.company) { toast.error("Cadastre sua empresa primeiro"); return; }
+    if (roles.some((r) => !r.label.trim() || !Number.isInteger(r.positions) || r.positions < 1 || r.positions > 500 || !Number.isFinite(r.pay_amount) || r.pay_amount < 0)) {
+      toast.error("Revise o nome, quantidade e valor dos cargos"); return;
+    }
+    const errs = validateJob(eventForm, { publishing: publish || !!editingLive });
     setErrors(errs);
     if (Object.keys(errs).length) { toast.error("Revise os campos destacados"); return; }
     const s = buildShift(f.date, f.start_time, f.end_time);
     const row = {
       title: f.title.trim(), category_id: f.category_id || null, description: f.description.trim(),
-      venue_name: f.venue_name.trim(), positions: f.positions, address: f.address.trim() || null,
+      venue_name: f.venue_name.trim(), positions: eventForm.positions, address: f.address.trim() || null,
       city: f.city.trim(), state: f.state.trim().toUpperCase(), starts_at: s.starts_at.toISOString(),
       ends_at: s.ends_at.toISOString(), pay_amount: f.pay_amount, requirements: f.requirements.trim() || null,
       benefits: f.benefits.trim() || null, banner_url: banner, payer,
@@ -93,19 +119,20 @@ export function JobForm({ job }: { job?: Job | null }) {
     setBusy(true);
     const res = job
       ? await supabase.from("jobs").update(row).eq("id", job.id).select("id").single()
-      : await supabase.from("jobs").insert({ ...row, company_id: me!.company!.id }).select("id").single();
-    setBusy(false);
-    if (res.error) { toast.error(errMsg(res.error)); return; }
+      : await supabase.from("jobs").insert({ ...row, company_id: me.company.id }).select("id").single();
+    if (res.error) { setBusy(false); toast.error(errMsg(res.error)); return; }
     const jobId = res.data.id;
-    await supabase.from("job_roles").delete().eq("job_id", jobId);
+    const { error: deleteError } = await supabase.from("job_roles").delete().eq("job_id", jobId);
+    if (deleteError) { setBusy(false); toast.error(errMsg(deleteError)); return; }
     const roleRows = roles.filter((r) => r.label.trim()).map((r) => ({
       job_id: jobId, category_id: r.category_id || null, label: r.label.trim(),
       positions: r.positions || 1, pay_amount: r.pay_amount || 0, entry_time: r.entry_time || null,
     }));
     if (roleRows.length) {
       const { error: rErr } = await supabase.from("job_roles").insert(roleRows);
-      if (rErr) { toast.error(errMsg(rErr)); return; }
+      if (rErr) { setBusy(false); toast.error(errMsg(rErr)); return; }
     }
+    setBusy(false);
     toast.success(publish ? "Vaga publicada!" : "Alterações salvas");
     qc.invalidateQueries();
     navigate({ to: "/contratante/vagas/$id", params: { id: res.data.id } });
@@ -129,22 +156,20 @@ export function JobForm({ job }: { job?: Job | null }) {
       </div>
       <div className="space-y-3 rounded-2xl border bg-card p-5 shadow-card">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <span className="text-sm font-semibold">Cargos deste evento</span>
+          <span className="text-sm font-semibold">Quadro de funcionários</span>
+          <div className="flex flex-wrap gap-2">
+          <Button type="button" variant="outline" size="sm" onClick={() => setCatalogOpen(true)}><Tags /> Usar meus preços</Button>
           <Button type="button" size="sm"
             onClick={() => setRoles([...roles, { category_id: "", label: "", positions: 1, pay_amount: f.pay_amount || 0, entry_time: f.start_time }])}>
             <Plus /> Adicionar cargo
           </Button>
+          </div>
         </div>
-        <p className="text-xs text-muted-foreground">
-          Um mesmo evento pode ter garçom, faxineiro, segurança… cada cargo com quantidade, valor e horário de
-          entrada próprios (ex.: caixas às 13h, seguranças às 10h). Se não adicionar cargos, vale a quantidade e a
-          remuneração informadas nos campos do evento.
-        </p>
         {roles.map((r, i) => (
           <div key={i} className="space-y-3 rounded-xl border p-3">
             <div className="flex items-center justify-between gap-2">
-              <Input value={r.label} onChange={(e) => updRole(i, { label: e.target.value })} maxLength={80} placeholder="Nome do cargo — ex.: Segurança" className="max-w-xs" />
-              <Button type="button" variant="ghost" size="sm" onClick={() => setRoles(roles.filter((_, j) => j !== i))}>
+              <Input aria-label={`Cargo ${i + 1}`} value={r.label} onChange={(e) => updRole(i, { label: e.target.value })} maxLength={80} placeholder="Nome do cargo — ex.: Segurança" className="max-w-xs" />
+              <Button type="button" variant="ghost" size="sm" aria-label={`Remover cargo ${i + 1}`} onClick={() => setRoles(roles.filter((_, j) => j !== i))}>
                 <Trash2 className="size-4 text-destructive" />
               </Button>
             </div>
@@ -155,12 +180,13 @@ export function JobForm({ job }: { job?: Job | null }) {
                   {cats.data?.filter((c) => c.active).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </Field>
-              <Field label="Quantidade"><Input type="number" min={1} max={500} value={r.positions} onChange={(e) => updRole(i, { positions: Number(e.target.value) })} /></Field>
-              <Field label="Valor por pessoa (R$)"><Input type="number" min={0} step="0.01" value={r.pay_amount} onChange={(e) => updRole(i, { pay_amount: Number(e.target.value) })} /></Field>
+              <Field label="Quantidade"><Input aria-label={`Quantidade de ${r.label || `cargo ${i + 1}`}`} type="number" min={1} max={500} value={r.positions} onChange={(e) => updRole(i, { positions: Number(e.target.value) })} /></Field>
+              <Field label="Valor por pessoa (R$)"><Input aria-label={`Valor de ${r.label || `cargo ${i + 1}`}`} type="number" min={0} step="0.01" value={r.pay_amount} onChange={(e) => updRole(i, { pay_amount: Number(e.target.value) })} /></Field>
               <Field label="Entrada"><Input type="time" value={r.entry_time} onChange={(e) => updRole(i, { entry_time: e.target.value })} /></Field>
             </div>
           </div>
         ))}
+        {roles.length > 0 && <div className="flex flex-wrap justify-between gap-3 border-t pt-3 text-sm font-semibold"><span>{totals.positions} profissionais</span><span>Valores dos cargos (sem taxas): {brl(totals.amount)}</span></div>}
       </div>
       <div className="space-y-4 rounded-2xl border bg-card p-5 shadow-card">
         <div className="grid gap-4 sm:grid-cols-3">
@@ -174,8 +200,8 @@ export function JobForm({ job }: { job?: Job | null }) {
           </p>
         )}
         <div className="grid gap-4 sm:grid-cols-3">
-          <Field label="Profissionais necessários *" error={errors.positions}><Input type="number" min={1} max={500} value={f.positions} onChange={set("positions")} /></Field>
-          <Field label="Remuneração por pessoa (R$) *" error={errors.pay_amount}><Input type="number" min={0} step="0.01" value={f.pay_amount} onChange={set("pay_amount")} /></Field>
+          <Field label="Profissionais necessários *" error={errors.positions}><Input type="number" min={1} max={500} value={eventForm.positions} readOnly={roles.length > 0} onChange={set("positions")} /></Field>
+          <Field label={roles.length ? "Remuneração de referência (R$) *" : "Remuneração por pessoa (R$) *"} error={errors.pay_amount}><Input type="number" min={0} step="0.01" value={f.pay_amount} onChange={set("pay_amount")} /></Field>
           <Field label="Prazo de candidatura" error={errors.deadline_date}><Input type="date" value={f.deadline_date} onChange={set("deadline_date")} /></Field>
         </div>
         <Field label="Endereço" hint="Mostrado somente para os contratados."><Input value={f.address} onChange={set("address")} maxLength={200} /></Field>
@@ -226,8 +252,22 @@ export function JobForm({ job }: { job?: Job | null }) {
             id: job?.id ?? "preview", title: f.title || "Título da vaga", venue_name: f.venue_name, city: f.city || "Cidade",
             state: f.state.toUpperCase() || "UF", starts_at: (shift?.starts_at ?? new Date()).toISOString(),
             ends_at: (shift?.ends_at ?? new Date()).toISOString(), pay_amount: f.pay_amount, status: "published",
-            banner_url: banner, positions: f.positions, professional_categories: cat ? { name: cat.name } : null,
+            banner_url: banner, positions: eventForm.positions, professional_categories: cat ? { name: cat.name } : null,
           }} />
+        </DialogContent>
+      </Dialog>
+      <Dialog open={catalogOpen} onOpenChange={setCatalogOpen}>
+        <DialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-2xl" aria-describedby={undefined}>
+          <DialogHeader><DialogTitle>Montar quadro com meus preços</DialogTitle></DialogHeader>
+          {catalog.isLoading ? <p className="text-sm text-muted-foreground">Carregando cargos…</p> : catalog.isError ? <p className="text-sm text-destructive">Não foi possível carregar seus preços.</p> : !activeItems.length ? <div className="space-y-3"><p className="text-sm text-muted-foreground">Nenhum cargo ativo cadastrado.</p><Button variant="outline" onClick={() => navigate({ to: "/contratante/precos" })}>Cadastrar em Meus preços</Button></div> : <>
+            <div className="divide-y">
+              {activeItems.map((item) => <div key={item.id} className="grid grid-cols-[1fr_100px] items-center gap-3 py-3">
+                <div className="min-w-0"><p className="break-words font-semibold">{item.name}</p><p className="text-sm text-muted-foreground">{brl(item.amount)} por pessoa</p></div>
+                <Field label="Quantidade"><Input aria-label={`Quantidade de ${item.name}`} type="number" min={0} max={500} value={quantities[item.id] ?? 0} onChange={(e) => setQuantities({ ...quantities, [item.id]: Number(e.target.value) })} /></Field>
+              </div>)}
+            </div>
+            <Button onClick={addCatalogRoles} disabled={!activeItems.some((item) => (quantities[item.id] ?? 0) > 0)}><Plus /> Adicionar ao evento</Button>
+          </>}
         </DialogContent>
       </Dialog>
     </div>
