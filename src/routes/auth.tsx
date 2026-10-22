@@ -53,7 +53,7 @@ function AuthPage() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     const em = emailSchema.safeParse(email);
-    if (!em.success) return toast.error(em.error.issues[0].message);
+    if (!em.success) { toast.error(em.error.issues[0]?.message ?? "E-mail inválido"); return; }
     setBusy(true);
     try {
       if (mode === "forgot") {
@@ -63,9 +63,9 @@ function AuthPage() {
         return;
       }
       const pw = passSchema.safeParse(password);
-      if (!pw.success) return toast.error(pw.error.issues[0].message);
+      if (!pw.success) { toast.error(pw.error.issues[0]?.message ?? "Senha inválida"); return; }
       if (mode === "signup") {
-        if (name.trim().length < 2) return toast.error("Informe seu nome");
+        if (name.trim().length < 2) { toast.error("Informe seu nome"); return; }
         const { data, error } = await supabase.auth.signUp({
           email: em.data, password: pw.data,
           options: { emailRedirectTo: window.location.origin + "/auth", data: { full_name: name.trim() } },
@@ -86,7 +86,7 @@ function AuthPage() {
 
   async function google() {
     const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/auth" });
-    if (r.error) return toast.error("Não foi possível entrar com Google");
+    if (r.error) { toast.error("Não foi possível entrar com Google"); return; }
     if (r.redirected) return;
     await goHome();
   }
