@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { EmptyState, Field, PageHeader, Spinner, StatusPill } from "@/components/gj";
-import { brl, errMsg, fmtDate, fmtShift } from "@/lib/format";
+import { brl, errMsg, fmtDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/contratante/relatorios")({
