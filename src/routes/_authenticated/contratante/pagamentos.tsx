@@ -123,7 +123,7 @@ function Payments() {
                   {totalGross > 0 && (
                     <div className="flex flex-wrap justify-between gap-2 rounded-2xl bg-primary-soft p-4 text-primary">
                       <span className="font-bold">Total da lista</span>
-                      <span className="font-display font-extrabold">{brl(totalGross)} bruto · {brl(totalNet)} líquido</span>
+                      <span className="font-display font-extrabold">{brl(totalCharge)} a pagar · {brl(totalNet)} aos profissionais</span>
                     </div>
                   )}
                 </div>
