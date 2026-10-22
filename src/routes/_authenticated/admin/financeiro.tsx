@@ -28,6 +28,7 @@ const SUB_LABEL: Record<string, string> = { pending: "Pendente", active: "Ativa"
 function Financeiro() {
   const qc = useQueryClient();
   const [fee, setFee] = useState("");
+  const [conFee, setConFee] = useState("");
   const stats = useQuery({
     queryKey: ["admin-fin"],
     queryFn: async () => {

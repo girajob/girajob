@@ -15,6 +15,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
       { to: "/admin/usuarios", label: "Usuários", icon: Users },
       { to: "/admin/categorias", label: "Categorias", icon: Tags },
       { to: "/admin/financeiro", label: "Financeiro", icon: CircleDollarSign },
+      { to: "/admin/relatorios", label: "Relatórios", icon: ChartColumn },
       { to: "/admin/auditoria", label: "Auditoria", icon: ScrollText },
     ]}>
       <Outlet />
