@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ImagePlus, Moon } from "lucide-react";
+import { ImagePlus, Moon, Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,7 @@ import { useMe } from "@/lib/session";
 import type { Database } from "@/integrations/supabase/types";
 
 type Job = Database["public"]["Tables"]["jobs"]["Row"];
+type RoleInput = { category_id: string; label: string; positions: number; pay_amount: number; entry_time: string };
 const sel = "h-10 w-full rounded-xl border border-input bg-card px-3 text-sm";
 
 function fromJob(j?: Job | null): JobFormInput {
@@ -40,6 +41,26 @@ export function JobForm({ job }: { job?: Job | null }) {
   const [f, setF] = useState<JobFormInput>(fromJob(job));
   const [payer, setPayer] = useState<"company" | "girajob">(job?.payer === "girajob" ? "girajob" : "company");
   const [banner, setBanner] = useState<string | null>(job?.banner_url ?? null);
+  const [roles, setRoles] = useState<RoleInput[]>([]);
+  const existingRoles = useQuery({
+    queryKey: ["job-roles", job?.id],
+    enabled: !!job?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("job_roles").select("*").eq("job_id", job!.id).order("created_at");
+      if (error) throw error;
+      return data;
+    },
+  });
+  useEffect(() => {
+    if (existingRoles.data?.length && roles.length === 0) {
+      setRoles(existingRoles.data.map((r) => ({
+        category_id: r.category_id ?? "", label: r.label, positions: r.positions,
+        pay_amount: Number(r.pay_amount), entry_time: r.entry_time ?? "",
+      })));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [existingRoles.data]);
+  const updRole = (i: number, patch: Partial<RoleInput>) => setRoles(roles.map((r, j) => (j === i ? { ...r, ...patch } : r)));
   const [errors, setErrors] = useState<ReturnType<typeof validateJob>>({});
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState(false);
@@ -75,6 +96,16 @@ export function JobForm({ job }: { job?: Job | null }) {
       : await supabase.from("jobs").insert({ ...row, company_id: me!.company!.id }).select("id").single();
     setBusy(false);
     if (res.error) { toast.error(errMsg(res.error)); return; }
+    const jobId = res.data.id;
+    await supabase.from("job_roles").delete().eq("job_id", jobId);
+    const roleRows = roles.filter((r) => r.label.trim()).map((r) => ({
+      job_id: jobId, category_id: r.category_id || null, label: r.label.trim(),
+      positions: r.positions || 1, pay_amount: r.pay_amount || 0, entry_time: r.entry_time || null,
+    }));
+    if (roleRows.length) {
+      const { error: rErr } = await supabase.from("job_roles").insert(roleRows);
+      if (rErr) { toast.error(errMsg(rErr)); return; }
+    }
     toast.success(publish ? "Vaga publicada!" : "Alterações salvas");
     qc.invalidateQueries();
     navigate({ to: "/contratante/vagas/$id", params: { id: res.data.id } });
@@ -137,6 +168,40 @@ export function JobForm({ job }: { job?: Job | null }) {
             Após as contratações, gere a cobrança na tela Pagamentos — você receberá a chave Pix ou o boleto para transferir o valor à GiraJob.
           </p>
         )}
+      </div>
+      <div className="space-y-4 rounded-2xl border bg-card p-5 shadow-card">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span className="text-sm font-semibold">Cargos deste evento</span>
+          <Button type="button" variant="outline" size="sm"
+            onClick={() => setRoles([...roles, { category_id: "", label: "", positions: 1, pay_amount: f.pay_amount || 0, entry_time: f.start_time }])}>
+            <Plus /> Adicionar cargo
+          </Button>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Opcional. Um mesmo evento pode ter garçom, faxineiro, segurança… cada cargo com quantidade, valor e horário de
+          entrada próprios (ex.: caixas às 13h, seguranças às 10h). Se vazio, vale o cargo principal acima.
+        </p>
+        {roles.map((r, i) => (
+          <div key={i} className="space-y-3 rounded-xl border p-3">
+            <div className="flex items-center justify-between gap-2">
+              <Input value={r.label} onChange={(e) => updRole(i, { label: e.target.value })} maxLength={80} placeholder="Nome do cargo — ex.: Segurança" className="max-w-xs" />
+              <Button type="button" variant="ghost" size="sm" onClick={() => setRoles(roles.filter((_, j) => j !== i))}>
+                <Trash2 className="size-4 text-destructive" />
+              </Button>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-4">
+              <Field label="Categoria">
+                <select className={sel} value={r.category_id} onChange={(e) => updRole(i, { category_id: e.target.value })}>
+                  <option value="">Geral</option>
+                  {cats.data?.filter((c) => c.active).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
+              </Field>
+              <Field label="Quantidade"><Input type="number" min={1} max={500} value={r.positions} onChange={(e) => updRole(i, { positions: Number(e.target.value) })} /></Field>
+              <Field label="Valor por pessoa (R$)"><Input type="number" min={0} step="0.01" value={r.pay_amount} onChange={(e) => updRole(i, { pay_amount: Number(e.target.value) })} /></Field>
+              <Field label="Entrada"><Input type="time" value={r.entry_time} onChange={(e) => updRole(i, { entry_time: e.target.value })} /></Field>
+            </div>
+          </div>
+        ))}
       </div>
       <div className="space-y-4 rounded-2xl border bg-card p-5 shadow-card">
         <Field label="Requisitos"><Textarea value={f.requirements} onChange={set("requirements")} maxLength={2000} /></Field>

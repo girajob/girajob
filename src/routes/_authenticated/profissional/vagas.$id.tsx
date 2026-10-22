@@ -22,6 +22,18 @@ function JobDetail() {
   const qc = useQueryClient();
   const job = useQuery(jobQuery(id));
   const mine = useQuery(myApplicationsQuery);
+  const roles = useQuery({
+    queryKey: ["job-roles", id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("job_roles")
+        .select("*, professional_categories(name)")
+        .eq("job_id", id)
+        .order("created_at");
+      if (error) throw error;
+      return data;
+    },
+  });
   const banner = useMediaUrl(job.data?.banner_url);
   const [open, setOpen] = useState(false);
   const [msg, setMsg] = useState("");
@@ -65,6 +77,27 @@ function JobDetail() {
         <Info icon={Users} label="Vagas" value={String(j.positions)} />
         <div><div className="text-xs font-semibold text-muted-foreground">Remuneração</div><div className="font-display text-2xl font-extrabold text-cta">{brl(j.pay_amount)}</div></div>
       </div>
+      {!!roles.data?.length && (
+        <section>
+          <h2 className="mb-2 text-lg font-bold">Cargos deste evento</h2>
+          <div className="space-y-2">
+            {roles.data.map((r) => (
+              <div key={r.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border bg-card p-3 text-sm shadow-card">
+                <div>
+                  <span className="font-bold">{r.label}</span>
+                  <span className="ml-2 text-muted-foreground">
+                    {r.professional_categories?.name ?? "Geral"} · {r.positions} vaga(s)
+                  </span>
+                </div>
+                <div className="text-right">
+                  <span className="font-display font-extrabold text-cta">{brl(r.pay_amount)}</span>
+                  {r.entry_time && <span className="ml-2 text-xs text-muted-foreground">entrada às {String(r.entry_time).slice(0, 5)}</span>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
       {[["Descrição", j.description], ["Requisitos", j.requirements], ["Benefícios", j.benefits]].map(([t, v]) => v ? (
         <section key={t}><h2 className="mb-1 text-lg font-bold">{t}</h2><p className="whitespace-pre-line text-sm">{v}</p></section>
       ) : null)}
