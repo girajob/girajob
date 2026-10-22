@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-import { Building2, Briefcase, LayoutDashboard, PlusCircle, QrCode } from "lucide-react";
+import { Building2, Briefcase, LayoutDashboard, PlusCircle, QrCode, Wallet } from "lucide-react";
 import { AppShell } from "@/components/shell";
 import { meQuery } from "@/lib/session";
 

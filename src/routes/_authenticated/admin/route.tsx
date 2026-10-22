@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-import { LayoutDashboard, Tags, Users } from "lucide-react";
+import { CircleDollarSign, LayoutDashboard, ScrollText, Tags, Users } from "lucide-react";
 import { AppShell } from "@/components/shell";
 import { meQuery } from "@/lib/session";
 
