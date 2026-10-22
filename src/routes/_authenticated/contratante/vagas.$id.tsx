@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { AlertTriangle, MapPin, Pencil, Star, Users } from "lucide-react";
+import { AlertTriangle, CircleDollarSign, MapPin, Pencil, Star, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -57,6 +57,7 @@ function ManageJob() {
         {j.status !== "closed" && (
           <Button asChild variant="outline"><Link to="/contratante/vagas/$id/editar" params={{ id }}><Pencil /> Editar</Link></Button>
         )}
+        <Button asChild variant="outline"><Link to="/contratante/pagamentos"><CircleDollarSign /> Pagamentos</Link></Button>
         {j.status === "draft" && <Button variant="cta" onClick={() => setStatus("published")}>Publicar</Button>}
         {j.status === "published" && <Button variant="secondary" onClick={() => setStatus("paused")}>Pausar</Button>}
         {j.status === "paused" && <Button variant="cta" onClick={() => setStatus("published")}>Reabrir</Button>}
