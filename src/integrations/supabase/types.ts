@@ -735,6 +735,8 @@ export type Database = {
           id: string
           onboarding_step: number
           phone: string | null
+          pix_key: string | null
+          pix_key_type: string | null
           postal_code: string | null
           skills: string[]
           state: string | null
@@ -759,6 +761,8 @@ export type Database = {
           id: string
           onboarding_step?: number
           phone?: string | null
+          pix_key?: string | null
+          pix_key_type?: string | null
           postal_code?: string | null
           skills?: string[]
           state?: string | null
@@ -783,6 +787,8 @@ export type Database = {
           id?: string
           onboarding_step?: number
           phone?: string | null
+          pix_key?: string | null
+          pix_key_type?: string | null
           postal_code?: string | null
           skills?: string[]
           state?: string | null
@@ -1086,6 +1092,8 @@ export type Database = {
           net: number
           payment_id: string
           payment_status: string
+          pix_key: string
+          pix_key_type: string
           pro_fee: number
           professional_name: string
           total_charge: number
