@@ -6,7 +6,7 @@ import { JobForm } from "@/components/job-form";
 import { jobQuery } from "@/lib/pro-queries";
 
 export const Route = createFileRoute("/_authenticated/contratante/vagas/$id_/editar")({
-  head: () => ({ meta: [{ title: "Editar vaga — GiraJob" }] }),
+  head: () => ({ meta: [{ title: "Editar quadro e vaga — GiraJob" }, { name: "description", content: "Atualize os cargos, valores e horários do seu evento GiraJob." }, { property: "og:title", content: "Editar quadro e vaga — GiraJob" }, { property: "og:description", content: "Revise seu quadro de funcionários e os dados da vaga." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Edit,
 });
 
