@@ -91,7 +91,7 @@ function Relatorios() {
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div>
                     <div className="flex items-center gap-2 font-bold">{r.title} <StatusPill status={r.status} /></div>
-                    <div className="text-sm text-muted-foreground">{fmtShift(r.starts_at, r.starts_at)} · {fmtDate(r.starts_at)}</div>
+                    <div className="text-sm text-muted-foreground">{fmtDate(r.starts_at)}</div>
                   </div>
                   <Button size="sm" variant="outline" onClick={() => setOpen(open === r.job_id ? null : r.job_id)}>
                     <CircleDollarSign /> {open === r.job_id ? "Fechar" : "Receitas e custos"}
