@@ -15,6 +15,13 @@
       "when": 1792691127244,
       "tag": "0001_girajob_phase1",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792691164390,
+      "tag": "0002_media_bucket_policies",
+      "breakpoints": true
     }
   ]
 }
