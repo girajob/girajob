@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { CircleDollarSign, RefreshCcw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { EmptyState, PageHeader, Spinner, StatCard, StatusPill } from "@/components/gj";
+import { PayInstructionsButton } from "@/components/pay-instructions";
 import { useMe } from "@/lib/session";
 import { brl, fmtDate } from "@/lib/format";
 
@@ -88,7 +89,7 @@ function Financeiro() {
           <div className="overflow-x-auto rounded-2xl border bg-card shadow-card">
             <table className="w-full text-sm">
               <thead className="bg-muted text-left text-xs uppercase text-muted-foreground">
-                <tr><th className="p-3">Data</th><th className="p-3">Serviço</th><th className="p-3">Sua taxa</th><th className="p-3">Total</th><th className="p-3">Status</th></tr>
+                <tr><th className="p-3">Data</th><th className="p-3">Serviço</th><th className="p-3">Sua taxa</th><th className="p-3">Total</th><th className="p-3">Status</th><th className="p-3"></th></tr>
               </thead>
               <tbody>
                 {rows.map((p) => (
@@ -98,6 +99,7 @@ function Financeiro() {
                     <td className="p-3">{brl(Number(p.total_charge || 0) - Number(p.gross_amount))}</td>
                     <td className="p-3 font-semibold">{brl(Number(p.total_charge || 0) || p.gross_amount)}</td>
                     <td className="p-3"><StatusPill status={p.status} label={PAY_LABEL[p.status]} /></td>
+                    <td className="p-3">{p.status === "pending" && <PayInstructionsButton paymentId={p.id} />}</td>
                   </tr>
                 ))}
               </tbody>
