@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-import { Building2, Briefcase, LayoutDashboard, PlusCircle, QrCode } from "lucide-react";
+import { Building2, Briefcase, LayoutDashboard, PlusCircle, QrCode, Wallet } from "lucide-react";
 import { AppShell } from "@/components/shell";
 import { meQuery } from "@/lib/session";
 
@@ -17,6 +17,7 @@ export const Route = createFileRoute("/_authenticated/contratante")({
         { to: "/contratante/vagas", label: "Vagas", icon: Briefcase, exact: true },
         { to: "/contratante/vagas/nova", label: "Publicar", icon: PlusCircle },
         { to: "/contratante/qr", label: "QR Code", icon: QrCode },
+        { to: "/contratante/pagamentos", label: "Pagamentos", icon: Wallet },
         { to: "/contratante/empresa", label: "Empresa", icon: Building2 },
       ]}
     >

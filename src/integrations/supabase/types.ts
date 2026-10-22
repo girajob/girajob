@@ -461,6 +461,27 @@ export type Database = {
           },
         ]
       }
+      platform_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
       professional_categories: {
         Row: {
           active: boolean
@@ -748,6 +769,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_financial_stats: { Args: never; Returns: Json }
       admin_list_users: {
         Args: { _search?: string }
         Returns: {
@@ -776,11 +798,23 @@ export type Database = {
         Args: { _job: string; _message?: string }
         Returns: string
       }
+      check_in_booking: {
+        Args: { _token: string }
+        Returns: {
+          booking_id: string
+          checked_in_at: string
+          ends_at: string
+          job_title: string
+          professional_name: string
+          starts_at: string
+        }[]
+      }
       choose_account_type: {
         Args: { _type: Database["public"]["Enums"]["app_role"] }
         Returns: undefined
       }
       confirm_hire: { Args: { _app: string }; Returns: string }
+      generate_payment_list: { Args: { _job: string }; Returns: number }
       get_booking_qr: { Args: { _booking: string }; Returns: string }
       has_role: {
         Args: {
@@ -807,16 +841,35 @@ export type Database = {
           status: Database["public"]["Enums"]["application_status"]
         }[]
       }
+      job_payment_list: {
+        Args: { _job: string }
+        Returns: {
+          booking_id: string
+          booking_status: Database["public"]["Enums"]["booking_status"]
+          checked_in_at: string
+          fee: number
+          gross: number
+          net: number
+          payment_id: string
+          payment_status: string
+          professional_name: string
+        }[]
+      }
       notify: {
         Args: { _body: string; _link: string; _title: string; _user: string }
         Returns: undefined
       }
       owns_company: { Args: { _company: string }; Returns: boolean }
+      service_fee_pct: { Args: never; Returns: number }
       set_application_status: {
         Args: {
           _app: string
           _status: Database["public"]["Enums"]["application_status"]
         }
+        Returns: undefined
+      }
+      set_platform_setting: {
+        Args: { _key: string; _value: Json }
         Returns: undefined
       }
       track_job_event: {
