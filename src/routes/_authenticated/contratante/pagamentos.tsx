@@ -21,7 +21,10 @@ type Row = {
   checked_in_at: string | null; gross: number; payment_id: string | null;
   payment_status: string | null; fee: number | null; net: number | null;
   pro_fee: number | null; contractor_fee: number | null; total_charge: number | null;
+  pix_key: string | null; pix_key_type: string | null;
 };
+
+const PIX_TYPE_LABEL: Record<string, string> = { cpf: "CPF", cnpj: "CNPJ", email: "E-mail", phone: "Telefone", random: "Chave aleatória" };
 
 const PAY_LABEL: Record<string, string> = { pending: "Pendente", paid: "Pago", failed: "Falhou", refunded: "Reembolsado", cancelled: "Cancelado" };
 
@@ -131,6 +134,13 @@ function Payments() {
                             <span className="text-warning">Entrada ainda não registrada</span>
                           )}
                         </div>
+                        {r.pix_key ? (
+                          <div className="mt-1 text-xs text-muted-foreground">
+                            Pix ({PIX_TYPE_LABEL[r.pix_key_type ?? ""] ?? "chave"}): <code className="rounded bg-muted px-1.5 py-0.5 font-semibold text-foreground">{r.pix_key}</code>
+                          </div>
+                        ) : (
+                          <div className="mt-1 text-xs text-warning">Profissional ainda não cadastrou a chave Pix</div>
+                        )}
                       </div>
                       <div className="text-right">
                         <div className="font-display text-lg font-extrabold">{brl(r.gross)}</div>
