@@ -29,6 +29,8 @@ function Financeiro() {
   const qc = useQueryClient();
   const [fee, setFee] = useState("");
   const [conFee, setConFee] = useState("");
+  const [pix, setPix] = useState("");
+  const [boleto, setBoleto] = useState("");
   const stats = useQuery({
     queryKey: ["admin-fin"],
     queryFn: async () => {
@@ -61,6 +63,24 @@ function Financeiro() {
       return data;
     },
   });
+
+  const settings = useQuery({
+    queryKey: ["admin-pay-settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("platform_settings").select("key, value").in("key", ["pix_key", "boleto_instructions"]);
+      if (error) throw error;
+      const map: Record<string, string> = {};
+      for (const row of data ?? []) map[row.key] = typeof row.value === "string" ? row.value : JSON.stringify(row.value);
+      return map;
+    },
+  });
+
+  async function saveSetting(key: "pix_key" | "boleto_instructions", value: string) {
+    const { error } = await supabase.rpc("set_platform_setting", { _key: key, _value: value.trim() });
+    if (error) { toast.error(errMsg(error)); return; }
+    toast.success("Instrução de pagamento salva");
+    qc.invalidateQueries({ queryKey: ["admin-pay-settings"] });
+  }
 
   async function saveFee(key: "service_fee_pct" | "contractor_fee_pct", raw: string, clear: () => void) {
     const pct = Number(raw.replace(",", "."));
@@ -96,6 +116,20 @@ function Financeiro() {
                 <Input value={conFee} onChange={(e) => setConFee(e.target.value)} placeholder={String(s.contractor_fee_pct)} className="w-32" inputMode="decimal" />
               </Field>
               <Button variant="cta" disabled={!conFee.trim()}>Salvar</Button>
+            </form>
+          </div>
+          <div className="grid gap-3 md:grid-cols-2">
+            <form onSubmit={(e) => { e.preventDefault(); saveSetting("pix_key", pix); }} className="flex flex-wrap items-end gap-3 rounded-2xl border bg-card p-4 shadow-card">
+              <Field label="Chave Pix da GiraJob" hint={`Atual: ${settings.data?.["pix_key"] || "não configurada"} — exibida ao contratante nas cobranças`}>
+                <Input value={pix} onChange={(e) => setPix(e.target.value)} placeholder="CNPJ, e-mail ou chave aleatória" className="w-64" />
+              </Field>
+              <Button variant="cta" disabled={!pix.trim()}>Salvar</Button>
+            </form>
+            <form onSubmit={(e) => { e.preventDefault(); saveSetting("boleto_instructions", boleto); }} className="flex flex-wrap items-end gap-3 rounded-2xl border bg-card p-4 shadow-card">
+              <Field label="Instruções de boleto" hint="Texto exibido ao contratante quando o pagamento for por boleto">
+                <Input value={boleto} onChange={(e) => setBoleto(e.target.value)} placeholder="Ex.: solicite o boleto pelo e-mail financeiro@…" className="w-64" />
+              </Field>
+              <Button variant="cta" disabled={!boleto.trim()}>Salvar</Button>
             </form>
           </div>
         </>
