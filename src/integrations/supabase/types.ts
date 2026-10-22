@@ -166,6 +166,8 @@ export type Database = {
           address_district: string | null
           address_line: string | null
           address_number: string | null
+          blocked: boolean
+          blocked_reason: string | null
           city: string | null
           created_at: string
           description: string | null
@@ -176,6 +178,7 @@ export type Database = {
           owner_id: string
           phone: string | null
           postal_code: string | null
+          seller_id: string | null
           state: string | null
           updated_at: string
         }
@@ -184,6 +187,8 @@ export type Database = {
           address_district?: string | null
           address_line?: string | null
           address_number?: string | null
+          blocked?: boolean
+          blocked_reason?: string | null
           city?: string | null
           created_at?: string
           description?: string | null
@@ -194,6 +199,7 @@ export type Database = {
           owner_id: string
           phone?: string | null
           postal_code?: string | null
+          seller_id?: string | null
           state?: string | null
           updated_at?: string
         }
@@ -202,6 +208,8 @@ export type Database = {
           address_district?: string | null
           address_line?: string | null
           address_number?: string | null
+          blocked?: boolean
+          blocked_reason?: string | null
           city?: string | null
           created_at?: string
           description?: string | null
@@ -212,6 +220,7 @@ export type Database = {
           owner_id?: string
           phone?: string | null
           postal_code?: string | null
+          seller_id?: string | null
           state?: string | null
           updated_at?: string
         }
@@ -220,6 +229,13 @@ export type Database = {
             foreignKeyName: "companies_owner_id_fkey"
             columns: ["owner_id"]
             isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "companies_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -320,6 +336,7 @@ export type Database = {
           id: string
           is_demo: boolean
           pay_amount: number
+          payer: string
           positions: number
           published_at: string | null
           requirements: string | null
@@ -347,6 +364,7 @@ export type Database = {
           id?: string
           is_demo?: boolean
           pay_amount: number
+          payer?: string
           positions?: number
           published_at?: string | null
           requirements?: string | null
@@ -374,6 +392,7 @@ export type Database = {
           id?: string
           is_demo?: boolean
           pay_amount?: number
+          payer?: string
           positions?: number
           published_at?: string | null
           requirements?: string | null
@@ -547,6 +566,47 @@ export type Database = {
           value?: Json
         }
         Relationships: []
+      }
+      price_catalog: {
+        Row: {
+          active: boolean
+          amount: number
+          company_id: string
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          amount: number
+          company_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          amount?: number
+          company_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "price_catalog_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       professional_categories: {
         Row: {
@@ -839,6 +899,26 @@ export type Database = {
         Args: { _amount: number; _description: string; _job: string }
         Returns: string
       }
+      admin_client_status: {
+        Args: never
+        Returns: {
+          blocked: boolean
+          blocked_reason: string
+          city: string
+          company_id: string
+          company_name: string
+          current_period_end: string
+          last_payment_at: string
+          owner_email: string
+          owner_name: string
+          paid_total: number
+          pending_amount: number
+          seller_name: string
+          state: string
+          subscription_plan: string
+          subscription_status: string
+        }[]
+      }
       admin_financial_stats: { Args: never; Returns: Json }
       admin_list_users: {
         Args: { _search?: string }
@@ -851,6 +931,18 @@ export type Database = {
           is_admin: boolean
           state: string
           status: Database["public"]["Enums"]["profile_status"]
+        }[]
+      }
+      admin_new_registrations: {
+        Args: { _days?: number }
+        Returns: {
+          account_type: Database["public"]["Enums"]["app_role"]
+          city: string
+          created_at: string
+          id: string
+          kind: string
+          name: string
+          state: string
         }[]
       }
       admin_revenue_report: {
@@ -956,6 +1048,8 @@ export type Database = {
         Returns: undefined
       }
       owns_company: { Args: { _company: string }; Returns: boolean }
+      payment_instructions: { Args: { _payment: string }; Returns: Json }
+      request_payout: { Args: { _job: string }; Returns: string }
       service_fee_pct: { Args: never; Returns: number }
       set_application_status: {
         Args: {
@@ -964,8 +1058,16 @@ export type Database = {
         }
         Returns: undefined
       }
+      set_company_blocked: {
+        Args: { _blocked: boolean; _company: string; _reason?: string }
+        Returns: undefined
+      }
       set_platform_setting: {
         Args: { _key: string; _value: Json }
+        Returns: undefined
+      }
+      set_user_role: {
+        Args: { _role: Database["public"]["Enums"]["app_role"]; _user: string }
         Returns: undefined
       }
       track_job_event: {
@@ -989,7 +1091,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "contractor" | "professional"
+      app_role: "admin" | "contractor" | "professional" | "seller"
       application_status:
         | "applied"
         | "in_review"
@@ -1132,7 +1234,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "contractor", "professional"],
+      app_role: ["admin", "contractor", "professional", "seller"],
       application_status: [
         "applied",
         "in_review",

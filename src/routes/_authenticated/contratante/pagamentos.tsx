@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { EmptyState, PageHeader, Spinner, StatusPill } from "@/components/gj";
+import { PayInstructionsButton, PayInstructionsDialog } from "@/components/pay-instructions";
 import { useMe } from "@/lib/session";
 import { companyJobsQuery } from "@/lib/contractor-queries";
 import { brl, errMsg, fmtShift, fmtTime } from "@/lib/format";
@@ -30,6 +31,7 @@ function Payments() {
   const jobs = useQuery({ ...companyJobsQuery(me?.company?.id ?? ""), enabled: !!me?.company?.id });
   const [jobId, setJobId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [payoutId, setPayoutId] = useState<string | null>(null);
 
   const list = useQuery({
     queryKey: ["payment-list", jobId],
@@ -49,6 +51,16 @@ function Payments() {
     if (error) { toast.error(errMsg(error)); return; }
     toast.success(data > 0 ? `${data} pagamento(s) gerado(s)` : "Nenhum pagamento novo — todos já estavam na lista");
     qc.invalidateQueries({ queryKey: ["payment-list", jobId] });
+  }
+
+  async function requestPayout() {
+    if (!jobId) return;
+    setBusy(true);
+    const { data, error } = await supabase.rpc("request_payout", { _job: jobId });
+    setBusy(false);
+    if (error) { toast.error(errMsg(error)); return; }
+    setPayoutId(data as string);
+    qc.invalidateQueries({ queryKey: ["my-payments"] });
   }
 
   const withHires = jobs.data?.filter((j) => (j.bookings ?? []).some((b) => b.status !== "cancelled")) ?? [];
@@ -87,10 +99,23 @@ function Payments() {
                     {pendingCheckin > 0 && ` · ${pendingCheckin} aguardando check-in`}
                   </div>
                 </div>
-                <Button variant="cta" onClick={generate} disabled={busy || rows.every((r) => r.payment_id) || rows.every((r) => !r.checked_in_at)}>
-                  <CircleDollarSign /> {busy ? "Gerando…" : "Gerar lista de pagamento"}
-                </Button>
+                <div className="flex flex-wrap gap-2">
+                  {selected?.payer === "girajob" && (
+                    <Button variant="secondary" onClick={requestPayout} disabled={busy}>
+                      <Wallet /> {busy ? "Gerando…" : "Gerar cobrança GiraJob"}
+                    </Button>
+                  )}
+                  <Button variant="cta" onClick={generate} disabled={busy || rows.every((r) => r.payment_id) || rows.every((r) => !r.checked_in_at)}>
+                    <CircleDollarSign /> {busy ? "Gerando…" : "Gerar lista de pagamento"}
+                  </Button>
+                </div>
               </div>
+              {selected?.payer === "girajob" && (
+                <p className="rounded-xl bg-primary-soft px-4 py-3 text-sm text-primary">
+                  Esta vaga é paga pela GiraJob: clique em <strong>Gerar cobrança GiraJob</strong> para receber a chave Pix ou o
+                  boleto com o valor total dos contratados. Após sua transferência, nós pagamos cada profissional.
+                </p>
+              )}
               {!rows.length ? (
                 <EmptyState icon={Wallet} title="Nenhum contratado nesta vaga" />
               ) : (
@@ -113,6 +138,9 @@ function Payments() {
                           <div className="text-xs text-muted-foreground">
                             profissional recebe {brl(r.net ?? 0)} (taxa {brl(r.pro_fee ?? 0)}) · sua taxa {brl(r.contractor_fee ?? 0)} · <strong>total a pagar {brl(r.total_charge ?? r.gross)}</strong>{" "}
                             <StatusPill status={r.payment_status ?? "pending"} label={PAY_LABEL[r.payment_status ?? "pending"]} />
+                            {r.payment_status === "pending" && r.payment_id && (
+                              <span className="ml-2 inline-block align-middle"><PayInstructionsButton paymentId={r.payment_id} /></span>
+                            )}
                           </div>
                         ) : (
                           <div className="text-xs text-muted-foreground">fora da lista de pagamento</div>
@@ -129,10 +157,11 @@ function Payments() {
                 </div>
               )}
               <p className="text-xs text-muted-foreground">
-                Os pagamentos ficam como “Pendente” até a integração com o provedor de cobrança (Pix/boleto). Nenhum valor é movimentado nesta fase.
+                Os pagamentos ficam como “Pendente” até a confirmação do recebimento pela GiraJob.
               </p>
             </div>
           )}
+          <PayInstructionsDialog paymentId={payoutId} open={!!payoutId} onOpenChange={(v) => { if (!v) setPayoutId(null); }} />
         </>
       )}
     </div>

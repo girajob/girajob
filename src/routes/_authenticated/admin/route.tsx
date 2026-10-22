@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-import { ChartColumn, CircleDollarSign, LayoutDashboard, ScrollText, Tags, Users } from "lucide-react";
+import { ChartColumn, CircleDollarSign, LayoutDashboard, ScrollText, Tags, UserPlus, Users } from "lucide-react";
 import { AppShell } from "@/components/shell";
 import { meQuery } from "@/lib/session";
 
@@ -12,11 +12,12 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: () => (
     <AppShell badge="Administrador" nav={[
       { to: "/admin", label: "Painel", icon: LayoutDashboard, exact: true },
+      { to: "/admin/cadastros", label: "Cadastros", icon: UserPlus },
       { to: "/admin/usuarios", label: "Usuários", icon: Users },
       { to: "/admin/categorias", label: "Categorias", icon: Tags },
       { to: "/admin/financeiro", label: "Financeiro", icon: CircleDollarSign },
       { to: "/admin/relatorios", label: "Relatórios", icon: ChartColumn },
-      { to: "/admin/auditoria", label: "Auditoria", icon: ScrollText },
+      { to: "/admin/auditoria", label: "Clientes", icon: ScrollText },
     ]}>
       <Outlet />
     </AppShell>
