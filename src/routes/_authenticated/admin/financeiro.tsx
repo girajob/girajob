@@ -78,10 +78,10 @@ function Financeiro() {
       {stats.isLoading || !s ? <Spinner /> : (
         <>
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <StatCard label="A receber (bruto)" value={brl(s.gross_pending)} icon={CircleDollarSign} hint={`${s.payments_by_status.pending ?? 0} pagamento(s) pendente(s)`} />
+            <StatCard label="A receber (bruto)" value={brl(s.gross_pending)} icon={CircleDollarSign} hint={`${s.payments_by_status["pending"] ?? 0} pagamento(s) pendente(s)`} />
             <StatCard label="Recebido (bruto)" value={brl(s.gross_paid)} icon={CreditCard} />
             <StatCard label="Taxas recebidas" value={brl(s.fees_paid)} icon={BadgePercent} />
-            <StatCard label="Assinaturas ativas" value={s.subscriptions_by_status.active ?? 0} icon={RefreshCcw} hint={`${s.subscriptions_by_status.pending ?? 0} pendente(s)`} />
+            <StatCard label="Assinaturas ativas" value={s.subscriptions_by_status["active"] ?? 0} icon={RefreshCcw} hint={`${s.subscriptions_by_status["pending"] ?? 0} pendente(s)`} />
           </div>
           <form onSubmit={saveFee} className="flex flex-wrap items-end gap-3 rounded-2xl border bg-card p-4 shadow-card">
             <Field label="Taxa da plataforma sobre serviços (%)" hint={`Atual: ${s.service_fee_pct}% — aplicada nas próximas listas de pagamento geradas`}>
