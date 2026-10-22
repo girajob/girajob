@@ -38,6 +38,7 @@ export function JobForm({ job }: { job?: Job | null }) {
   const qc = useQueryClient();
   const navigate = useNavigate();
   const [f, setF] = useState<JobFormInput>(fromJob(job));
+  const [payer, setPayer] = useState<"company" | "girajob">(job?.payer === "girajob" ? "girajob" : "company");
   const [banner, setBanner] = useState<string | null>(job?.banner_url ?? null);
   const [errors, setErrors] = useState<ReturnType<typeof validateJob>>({});
   const [busy, setBusy] = useState(false);
@@ -64,7 +65,7 @@ export function JobForm({ job }: { job?: Job | null }) {
       venue_name: f.venue_name.trim(), positions: f.positions, address: f.address.trim() || null,
       city: f.city.trim(), state: f.state.trim().toUpperCase(), starts_at: s.starts_at.toISOString(),
       ends_at: s.ends_at.toISOString(), pay_amount: f.pay_amount, requirements: f.requirements.trim() || null,
-      benefits: f.benefits.trim() || null, banner_url: banner,
+      benefits: f.benefits.trim() || null, banner_url: banner, payer,
       application_deadline: f.deadline_date ? new Date(`${f.deadline_date}T${f.deadline_time || "23:59"}:00`).toISOString() : null,
       ...(publish ? { status: "published" as const } : {}),
     };
@@ -116,6 +117,26 @@ export function JobForm({ job }: { job?: Job | null }) {
           <Field label="Cidade *" error={errors.city}><Input value={f.city} onChange={set("city")} maxLength={80} /></Field>
           <Field label="UF *" error={errors.state}><Input value={f.state} onChange={set("state")} maxLength={2} /></Field>
         </div>
+      </div>
+      <div className="space-y-3 rounded-2xl border bg-card p-5 shadow-card">
+        <span className="text-sm font-semibold">Quem paga os contratados? *</span>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <button type="button" onClick={() => setPayer("company")}
+            className={`rounded-xl border p-4 text-left text-sm transition ${payer === "company" ? "border-primary bg-primary-soft" : "bg-card"}`}>
+            <span className="block font-bold">Minha empresa paga diretamente</span>
+            <span className="mt-1 block text-xs text-muted-foreground">Você acerta o valor com cada profissional por conta própria.</span>
+          </button>
+          <button type="button" onClick={() => setPayer("girajob")}
+            className={`rounded-xl border p-4 text-left text-sm transition ${payer === "girajob" ? "border-primary bg-primary-soft" : "bg-card"}`}>
+            <span className="block font-bold">A GiraJob paga por mim</span>
+            <span className="mt-1 block text-xs text-muted-foreground">Você transfere o valor total à GiraJob (Pix ou boleto) e nós pagamos os contratados.</span>
+          </button>
+        </div>
+        {payer === "girajob" && (
+          <p className="rounded-xl bg-cta-soft px-3 py-2 text-sm font-semibold text-cta">
+            Após as contratações, gere a cobrança na tela Pagamentos — você receberá a chave Pix ou o boleto para transferir o valor à GiraJob.
+          </p>
+        )}
       </div>
       <div className="space-y-4 rounded-2xl border bg-card p-5 shadow-card">
         <Field label="Requisitos"><Textarea value={f.requirements} onChange={set("requirements")} maxLength={2000} /></Field>

@@ -20,6 +20,7 @@ import { Route as AuthenticatedInicioRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedProfissionalRouteRouteImport } from './routes/_authenticated/profissional/route'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedAdminAuditoriaRouteImport } from './routes/_authenticated/admin/auditoria'
+import { Route as AuthenticatedAdminCadastrosRouteImport } from './routes/_authenticated/admin/cadastros'
 import { Route as AuthenticatedAdminCategoriasRouteImport } from './routes/_authenticated/admin/categorias'
 import { Route as AuthenticatedAdminFinanceiroRouteImport } from './routes/_authenticated/admin/financeiro'
 import { Route as AuthenticatedAdminRelatoriosRouteImport } from './routes/_authenticated/admin/relatorios'
@@ -28,6 +29,7 @@ import { Route as AuthenticatedContratanteIndexRouteImport } from './routes/_aut
 import { Route as AuthenticatedContratanteEmpresaRouteImport } from './routes/_authenticated/contratante/empresa'
 import { Route as AuthenticatedContratanteFinanceiroRouteImport } from './routes/_authenticated/contratante/financeiro'
 import { Route as AuthenticatedContratantePagamentosRouteImport } from './routes/_authenticated/contratante/pagamentos'
+import { Route as AuthenticatedContratantePrecosRouteImport } from './routes/_authenticated/contratante/precos'
 import { Route as AuthenticatedContratanteQrRouteImport } from './routes/_authenticated/contratante/qr'
 import { Route as AuthenticatedContratanteRelatoriosRouteImport } from './routes/_authenticated/contratante/relatorios'
 import { Route as AuthenticatedProfissionalIndexRouteImport } from './routes/_authenticated/profissional/index'
@@ -100,6 +102,12 @@ const AuthenticatedAdminAuditoriaRoute =
     path: '/auditoria',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminCadastrosRoute =
+  AuthenticatedAdminCadastrosRouteImport.update({
+    id: '/cadastros',
+    path: '/cadastros',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminCategoriasRoute =
   AuthenticatedAdminCategoriasRouteImport.update({
     id: '/categorias',
@@ -146,6 +154,12 @@ const AuthenticatedContratantePagamentosRoute =
   AuthenticatedContratantePagamentosRouteImport.update({
     id: '/pagamentos',
     path: '/pagamentos',
+    getParentRoute: () => AuthenticatedContratanteRouteRoute,
+  } as any)
+const AuthenticatedContratantePrecosRoute =
+  AuthenticatedContratantePrecosRouteImport.update({
+    id: '/precos',
+    path: '/precos',
     getParentRoute: () => AuthenticatedContratanteRouteRoute,
   } as any)
 const AuthenticatedContratanteQrRoute =
@@ -237,6 +251,7 @@ export interface FileRoutesByFullPath {
   '/escolher-perfil': typeof AuthenticatedEscolherPerfilRoute
   '/inicio': typeof AuthenticatedInicioRoute
   '/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
+  '/admin/cadastros': typeof AuthenticatedAdminCadastrosRoute
   '/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
   '/admin/financeiro': typeof AuthenticatedAdminFinanceiroRoute
   '/admin/relatorios': typeof AuthenticatedAdminRelatoriosRoute
@@ -244,6 +259,7 @@ export interface FileRoutesByFullPath {
   '/contratante/empresa': typeof AuthenticatedContratanteEmpresaRoute
   '/contratante/financeiro': typeof AuthenticatedContratanteFinanceiroRoute
   '/contratante/pagamentos': typeof AuthenticatedContratantePagamentosRoute
+  '/contratante/precos': typeof AuthenticatedContratantePrecosRoute
   '/contratante/qr': typeof AuthenticatedContratanteQrRoute
   '/contratante/relatorios': typeof AuthenticatedContratanteRelatoriosRoute
   '/profissional/agenda': typeof AuthenticatedProfissionalAgendaRoute
@@ -267,6 +283,7 @@ export interface FileRoutesByTo {
   '/escolher-perfil': typeof AuthenticatedEscolherPerfilRoute
   '/inicio': typeof AuthenticatedInicioRoute
   '/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
+  '/admin/cadastros': typeof AuthenticatedAdminCadastrosRoute
   '/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
   '/admin/financeiro': typeof AuthenticatedAdminFinanceiroRoute
   '/admin/relatorios': typeof AuthenticatedAdminRelatoriosRoute
@@ -274,6 +291,7 @@ export interface FileRoutesByTo {
   '/contratante/empresa': typeof AuthenticatedContratanteEmpresaRoute
   '/contratante/financeiro': typeof AuthenticatedContratanteFinanceiroRoute
   '/contratante/pagamentos': typeof AuthenticatedContratantePagamentosRoute
+  '/contratante/precos': typeof AuthenticatedContratantePrecosRoute
   '/contratante/qr': typeof AuthenticatedContratanteQrRoute
   '/contratante/relatorios': typeof AuthenticatedContratanteRelatoriosRoute
   '/profissional/agenda': typeof AuthenticatedProfissionalAgendaRoute
@@ -302,6 +320,7 @@ export interface FileRoutesById {
   '/_authenticated/escolher-perfil': typeof AuthenticatedEscolherPerfilRoute
   '/_authenticated/inicio': typeof AuthenticatedInicioRoute
   '/_authenticated/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
+  '/_authenticated/admin/cadastros': typeof AuthenticatedAdminCadastrosRoute
   '/_authenticated/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
   '/_authenticated/admin/financeiro': typeof AuthenticatedAdminFinanceiroRoute
   '/_authenticated/admin/relatorios': typeof AuthenticatedAdminRelatoriosRoute
@@ -309,6 +328,7 @@ export interface FileRoutesById {
   '/_authenticated/contratante/empresa': typeof AuthenticatedContratanteEmpresaRoute
   '/_authenticated/contratante/financeiro': typeof AuthenticatedContratanteFinanceiroRoute
   '/_authenticated/contratante/pagamentos': typeof AuthenticatedContratantePagamentosRoute
+  '/_authenticated/contratante/precos': typeof AuthenticatedContratantePrecosRoute
   '/_authenticated/contratante/qr': typeof AuthenticatedContratanteQrRoute
   '/_authenticated/contratante/relatorios': typeof AuthenticatedContratanteRelatoriosRoute
   '/_authenticated/profissional/agenda': typeof AuthenticatedProfissionalAgendaRoute
@@ -337,6 +357,7 @@ export interface FileRouteTypes {
     | '/escolher-perfil'
     | '/inicio'
     | '/admin/auditoria'
+    | '/admin/cadastros'
     | '/admin/categorias'
     | '/admin/financeiro'
     | '/admin/relatorios'
@@ -344,6 +365,7 @@ export interface FileRouteTypes {
     | '/contratante/empresa'
     | '/contratante/financeiro'
     | '/contratante/pagamentos'
+    | '/contratante/precos'
     | '/contratante/qr'
     | '/contratante/relatorios'
     | '/profissional/agenda'
@@ -367,6 +389,7 @@ export interface FileRouteTypes {
     | '/escolher-perfil'
     | '/inicio'
     | '/admin/auditoria'
+    | '/admin/cadastros'
     | '/admin/categorias'
     | '/admin/financeiro'
     | '/admin/relatorios'
@@ -374,6 +397,7 @@ export interface FileRouteTypes {
     | '/contratante/empresa'
     | '/contratante/financeiro'
     | '/contratante/pagamentos'
+    | '/contratante/precos'
     | '/contratante/qr'
     | '/contratante/relatorios'
     | '/profissional/agenda'
@@ -401,6 +425,7 @@ export interface FileRouteTypes {
     | '/_authenticated/escolher-perfil'
     | '/_authenticated/inicio'
     | '/_authenticated/admin/auditoria'
+    | '/_authenticated/admin/cadastros'
     | '/_authenticated/admin/categorias'
     | '/_authenticated/admin/financeiro'
     | '/_authenticated/admin/relatorios'
@@ -408,6 +433,7 @@ export interface FileRouteTypes {
     | '/_authenticated/contratante/empresa'
     | '/_authenticated/contratante/financeiro'
     | '/_authenticated/contratante/pagamentos'
+    | '/_authenticated/contratante/precos'
     | '/_authenticated/contratante/qr'
     | '/_authenticated/contratante/relatorios'
     | '/_authenticated/profissional/agenda'
@@ -511,6 +537,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAuditoriaRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/cadastros': {
+      id: '/_authenticated/admin/cadastros'
+      path: '/cadastros'
+      fullPath: '/admin/cadastros'
+      preLoaderRoute: typeof AuthenticatedAdminCadastrosRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/categorias': {
       id: '/_authenticated/admin/categorias'
       path: '/categorias'
@@ -565,6 +598,13 @@ declare module '@tanstack/react-router' {
       path: '/pagamentos'
       fullPath: '/contratante/pagamentos'
       preLoaderRoute: typeof AuthenticatedContratantePagamentosRouteImport
+      parentRoute: typeof AuthenticatedContratanteRouteRoute
+    }
+    '/_authenticated/contratante/precos': {
+      id: '/_authenticated/contratante/precos'
+      path: '/precos'
+      fullPath: '/contratante/precos'
+      preLoaderRoute: typeof AuthenticatedContratantePrecosRouteImport
       parentRoute: typeof AuthenticatedContratanteRouteRoute
     }
     '/_authenticated/contratante/qr': {
@@ -663,6 +703,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminAuditoriaRoute: typeof AuthenticatedAdminAuditoriaRoute
+  AuthenticatedAdminCadastrosRoute: typeof AuthenticatedAdminCadastrosRoute
   AuthenticatedAdminCategoriasRoute: typeof AuthenticatedAdminCategoriasRoute
   AuthenticatedAdminFinanceiroRoute: typeof AuthenticatedAdminFinanceiroRoute
   AuthenticatedAdminRelatoriosRoute: typeof AuthenticatedAdminRelatoriosRoute
@@ -673,6 +714,7 @@ interface AuthenticatedAdminRouteRouteChildren {
 const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
   {
     AuthenticatedAdminAuditoriaRoute: AuthenticatedAdminAuditoriaRoute,
+    AuthenticatedAdminCadastrosRoute: AuthenticatedAdminCadastrosRoute,
     AuthenticatedAdminCategoriasRoute: AuthenticatedAdminCategoriasRoute,
     AuthenticatedAdminFinanceiroRoute: AuthenticatedAdminFinanceiroRoute,
     AuthenticatedAdminRelatoriosRoute: AuthenticatedAdminRelatoriosRoute,
@@ -689,6 +731,7 @@ interface AuthenticatedContratanteRouteRouteChildren {
   AuthenticatedContratanteEmpresaRoute: typeof AuthenticatedContratanteEmpresaRoute
   AuthenticatedContratanteFinanceiroRoute: typeof AuthenticatedContratanteFinanceiroRoute
   AuthenticatedContratantePagamentosRoute: typeof AuthenticatedContratantePagamentosRoute
+  AuthenticatedContratantePrecosRoute: typeof AuthenticatedContratantePrecosRoute
   AuthenticatedContratanteQrRoute: typeof AuthenticatedContratanteQrRoute
   AuthenticatedContratanteRelatoriosRoute: typeof AuthenticatedContratanteRelatoriosRoute
   AuthenticatedContratanteIndexRoute: typeof AuthenticatedContratanteIndexRoute
@@ -705,6 +748,7 @@ const AuthenticatedContratanteRouteRouteChildren: AuthenticatedContratanteRouteR
       AuthenticatedContratanteFinanceiroRoute,
     AuthenticatedContratantePagamentosRoute:
       AuthenticatedContratantePagamentosRoute,
+    AuthenticatedContratantePrecosRoute: AuthenticatedContratantePrecosRoute,
     AuthenticatedContratanteQrRoute: AuthenticatedContratanteQrRoute,
     AuthenticatedContratanteRelatoriosRoute:
       AuthenticatedContratanteRelatoriosRoute,
