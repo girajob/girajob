@@ -162,6 +162,10 @@ export type Database = {
       }
       companies: {
         Row: {
+          address_complement: string | null
+          address_district: string | null
+          address_line: string | null
+          address_number: string | null
           city: string | null
           created_at: string
           description: string | null
@@ -171,10 +175,15 @@ export type Database = {
           name: string
           owner_id: string
           phone: string | null
+          postal_code: string | null
           state: string | null
           updated_at: string
         }
         Insert: {
+          address_complement?: string | null
+          address_district?: string | null
+          address_line?: string | null
+          address_number?: string | null
           city?: string | null
           created_at?: string
           description?: string | null
@@ -184,10 +193,15 @@ export type Database = {
           name: string
           owner_id: string
           phone?: string | null
+          postal_code?: string | null
           state?: string | null
           updated_at?: string
         }
         Update: {
+          address_complement?: string | null
+          address_district?: string | null
+          address_line?: string | null
+          address_number?: string | null
           city?: string | null
           created_at?: string
           description?: string | null
@@ -197,6 +211,7 @@ export type Database = {
           name?: string
           owner_id?: string
           phone?: string | null
+          postal_code?: string | null
           state?: string | null
           updated_at?: string
         }
@@ -206,6 +221,48 @@ export type Database = {
             columns: ["owner_id"]
             isOneToOne: true
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_revenues: {
+        Row: {
+          amount: number
+          company_id: string
+          created_at: string
+          description: string
+          id: string
+          job_id: string
+        }
+        Insert: {
+          amount?: number
+          company_id: string
+          created_at?: string
+          description: string
+          id?: string
+          job_id: string
+        }
+        Update: {
+          amount?: number
+          company_id?: string
+          created_at?: string
+          description?: string
+          id?: string
+          job_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_revenues_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_revenues_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
             referencedColumns: ["id"]
           },
         ]
@@ -778,6 +835,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_event_revenue: {
+        Args: { _amount: number; _description: string; _job: string }
+        Returns: string
+      }
       admin_financial_stats: { Args: never; Returns: Json }
       admin_list_users: {
         Args: { _search?: string }
@@ -827,7 +888,25 @@ export type Database = {
         Returns: undefined
       }
       confirm_hire: { Args: { _app: string }; Returns: string }
+      contractor_events_report: {
+        Args: never
+        Returns: {
+          balance: number
+          checkins: number
+          fees: number
+          hired: number
+          job_id: string
+          labor_cost: number
+          positions: number
+          pro_payout: number
+          revenue: number
+          starts_at: string
+          status: Database["public"]["Enums"]["job_status"]
+          title: string
+        }[]
+      }
       contractor_fee_pct: { Args: never; Returns: number }
+      delete_event_revenue: { Args: { _id: string }; Returns: undefined }
       generate_payment_list: { Args: { _job: string }; Returns: number }
       get_booking_qr: { Args: { _booking: string }; Returns: string }
       has_role: {

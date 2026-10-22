@@ -14,6 +14,7 @@ import { useMe } from "@/lib/session";
 import { categoriesQuery } from "@/lib/pro-queries";
 import { uploadMedia, useMediaUrl } from "@/lib/media";
 import { errMsg } from "@/lib/format";
+import { fetchCep } from "@/lib/br-lookup";
 import { cn } from "@/lib/utils";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -102,6 +103,20 @@ function Wizard() {
     } catch (e) { toast.error(errMsg(e)); } finally { setBusy(false); }
   }
 
+  async function lookupCep() {
+    const digits = f.postal_code.replace(/\D/g, "");
+    if (digits.length !== 8) return;
+    const info = await fetchCep(digits);
+    if (!info) { toast.error("CEP não encontrado"); return; }
+    setF((p) => ({
+      ...p,
+      address_line: [info.logradouro, info.bairro].filter(Boolean).join(", ") || p.address_line,
+      city: info.localidade || p.city,
+      state: info.uf || p.state,
+    }));
+    toast.success("Endereço preenchido pelo CEP");
+  }
+
   function locate() {
     navigator.geolocation.getCurrentPosition(
       (p) => { setLat(Math.round(p.coords.latitude * 100) / 100); setLng(Math.round(p.coords.longitude * 100) / 100); toast.success("Localização aproximada salva"); },
@@ -138,7 +153,7 @@ function Wizard() {
         {step === 2 && <>
           <Field label="Endereço" hint="Nunca é mostrado aos contratantes."><Input value={f.address_line} onChange={set("address_line")} maxLength={200} /></Field>
           <div className="grid gap-4 sm:grid-cols-[1fr_1fr_90px]">
-            <Field label="CEP"><Input value={f.postal_code} onChange={set("postal_code")} maxLength={9} /></Field>
+            <Field label="CEP" hint="Preenche rua, bairro e cidade sozinho."><Input value={f.postal_code} onChange={set("postal_code")} onBlur={lookupCep} maxLength={9} inputMode="numeric" placeholder="00000-000" /></Field>
             <Field label="Cidade"><Input value={f.city} onChange={set("city")} maxLength={80} /></Field>
             <Field label="UF"><Input value={f.state} onChange={set("state")} maxLength={2} /></Field>
           </div>
