@@ -64,6 +64,13 @@
       "when": 1792695855287,
       "tag": "0008_payments_kind_payout_deposit",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1792696000806,
+      "tag": "0009_job_roles",
+      "breakpoints": true
     }
   ]
 }

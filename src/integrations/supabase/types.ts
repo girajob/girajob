@@ -318,6 +318,54 @@ export type Database = {
           },
         ]
       }
+      job_roles: {
+        Row: {
+          category_id: string | null
+          created_at: string
+          entry_time: string | null
+          id: string
+          job_id: string
+          label: string
+          pay_amount: number
+          positions: number
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string
+          entry_time?: string | null
+          id?: string
+          job_id: string
+          label: string
+          pay_amount?: number
+          positions?: number
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string
+          entry_time?: string | null
+          id?: string
+          job_id?: string
+          label?: string
+          pay_amount?: number
+          positions?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_roles_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "professional_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_roles_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       jobs: {
         Row: {
           address: string | null
