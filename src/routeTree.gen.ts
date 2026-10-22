@@ -15,6 +15,9 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedEscolherPerfilRouteImport } from './routes/_authenticated/escolher-perfil'
 import { Route as AuthenticatedInicioRouteImport } from './routes/_authenticated/inicio'
+import { Route as AuthenticatedProfissionalRouteRouteImport } from './routes/_authenticated/profissional/route'
+import { Route as AuthenticatedProfissionalIndexRouteImport } from './routes/_authenticated/profissional/index'
+import { Route as AuthenticatedProfissionalExplorarRouteImport } from './routes/_authenticated/profissional/explorar'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -46,13 +49,34 @@ const AuthenticatedInicioRoute = AuthenticatedInicioRouteImport.update({
   path: '/inicio',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedProfissionalRouteRoute =
+  AuthenticatedProfissionalRouteRouteImport.update({
+    id: '/profissional',
+    path: '/profissional',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedProfissionalIndexRoute =
+  AuthenticatedProfissionalIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedProfissionalRouteRoute,
+  } as any)
+const AuthenticatedProfissionalExplorarRoute =
+  AuthenticatedProfissionalExplorarRouteImport.update({
+    id: '/explorar',
+    path: '/explorar',
+    getParentRoute: () => AuthenticatedProfissionalRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/profissional': typeof AuthenticatedProfissionalRouteRouteWithChildren
   '/escolher-perfil': typeof AuthenticatedEscolherPerfilRoute
   '/inicio': typeof AuthenticatedInicioRoute
+  '/profissional/explorar': typeof AuthenticatedProfissionalExplorarRoute
+  '/profissional/': typeof AuthenticatedProfissionalIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -60,6 +84,8 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/escolher-perfil': typeof AuthenticatedEscolherPerfilRoute
   '/inicio': typeof AuthenticatedInicioRoute
+  '/profissional/explorar': typeof AuthenticatedProfissionalExplorarRoute
+  '/profissional': typeof AuthenticatedProfissionalIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -67,22 +93,43 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/profissional': typeof AuthenticatedProfissionalRouteRouteWithChildren
   '/_authenticated/escolher-perfil': typeof AuthenticatedEscolherPerfilRoute
   '/_authenticated/inicio': typeof AuthenticatedInicioRoute
+  '/_authenticated/profissional/explorar': typeof AuthenticatedProfissionalExplorarRoute
+  '/_authenticated/profissional/': typeof AuthenticatedProfissionalIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/reset-password' | '/escolher-perfil' | '/inicio'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/reset-password'
+    | '/profissional'
+    | '/escolher-perfil'
+    | '/inicio'
+    | '/profissional/explorar'
+    | '/profissional/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/reset-password' | '/escolher-perfil' | '/inicio'
+  to:
+    | '/'
+    | '/auth'
+    | '/reset-password'
+    | '/escolher-perfil'
+    | '/inicio'
+    | '/profissional/explorar'
+    | '/profissional'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/reset-password'
+    | '/_authenticated/profissional'
     | '/_authenticated/escolher-perfil'
     | '/_authenticated/inicio'
+    | '/_authenticated/profissional/explorar'
+    | '/_authenticated/profissional/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -136,15 +183,56 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedInicioRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/profissional': {
+      id: '/_authenticated/profissional'
+      path: '/profissional'
+      fullPath: '/profissional'
+      preLoaderRoute: typeof AuthenticatedProfissionalRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/profissional/': {
+      id: '/_authenticated/profissional/'
+      path: '/'
+      fullPath: '/profissional/'
+      preLoaderRoute: typeof AuthenticatedProfissionalIndexRouteImport
+      parentRoute: typeof AuthenticatedProfissionalRouteRoute
+    }
+    '/_authenticated/profissional/explorar': {
+      id: '/_authenticated/profissional/explorar'
+      path: '/explorar'
+      fullPath: '/profissional/explorar'
+      preLoaderRoute: typeof AuthenticatedProfissionalExplorarRouteImport
+      parentRoute: typeof AuthenticatedProfissionalRouteRoute
+    }
   }
 }
 
+interface AuthenticatedProfissionalRouteRouteChildren {
+  AuthenticatedProfissionalExplorarRoute: typeof AuthenticatedProfissionalExplorarRoute
+  AuthenticatedProfissionalIndexRoute: typeof AuthenticatedProfissionalIndexRoute
+}
+
+const AuthenticatedProfissionalRouteRouteChildren: AuthenticatedProfissionalRouteRouteChildren =
+  {
+    AuthenticatedProfissionalExplorarRoute:
+      AuthenticatedProfissionalExplorarRoute,
+    AuthenticatedProfissionalIndexRoute: AuthenticatedProfissionalIndexRoute,
+  }
+
+const AuthenticatedProfissionalRouteRouteWithChildren =
+  AuthenticatedProfissionalRouteRoute._addFileChildren(
+    AuthenticatedProfissionalRouteRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedProfissionalRouteRoute: typeof AuthenticatedProfissionalRouteRouteWithChildren
   AuthenticatedEscolherPerfilRoute: typeof AuthenticatedEscolherPerfilRoute
   AuthenticatedInicioRoute: typeof AuthenticatedInicioRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedProfissionalRouteRoute:
+    AuthenticatedProfissionalRouteRouteWithChildren,
   AuthenticatedEscolherPerfilRoute: AuthenticatedEscolherPerfilRoute,
   AuthenticatedInicioRoute: AuthenticatedInicioRoute,
 }
