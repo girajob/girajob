@@ -22,6 +22,7 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminAuditoriaRouteImport } from './routes/_authenticated/admin/auditoria'
 import { Route as AuthenticatedAdminCategoriasRouteImport } from './routes/_authenticated/admin/categorias'
 import { Route as AuthenticatedAdminFinanceiroRouteImport } from './routes/_authenticated/admin/financeiro'
+import { Route as AuthenticatedAdminRelatoriosRouteImport } from './routes/_authenticated/admin/relatorios'
 import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin/usuarios'
 import { Route as AuthenticatedContratanteIndexRouteImport } from './routes/_authenticated/contratante/index'
 import { Route as AuthenticatedContratanteEmpresaRouteImport } from './routes/_authenticated/contratante/empresa'
@@ -107,6 +108,12 @@ const AuthenticatedAdminFinanceiroRoute =
   AuthenticatedAdminFinanceiroRouteImport.update({
     id: '/financeiro',
     path: '/financeiro',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminRelatoriosRoute =
+  AuthenticatedAdminRelatoriosRouteImport.update({
+    id: '/relatorios',
+    path: '/relatorios',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 const AuthenticatedAdminUsuariosRoute =
@@ -218,6 +225,7 @@ export interface FileRoutesByFullPath {
   '/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
   '/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
   '/admin/financeiro': typeof AuthenticatedAdminFinanceiroRoute
+  '/admin/relatorios': typeof AuthenticatedAdminRelatoriosRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/contratante/empresa': typeof AuthenticatedContratanteEmpresaRoute
   '/contratante/pagamentos': typeof AuthenticatedContratantePagamentosRoute
@@ -245,6 +253,7 @@ export interface FileRoutesByTo {
   '/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
   '/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
   '/admin/financeiro': typeof AuthenticatedAdminFinanceiroRoute
+  '/admin/relatorios': typeof AuthenticatedAdminRelatoriosRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/contratante/empresa': typeof AuthenticatedContratanteEmpresaRoute
   '/contratante/pagamentos': typeof AuthenticatedContratantePagamentosRoute
@@ -277,6 +286,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
   '/_authenticated/admin/categorias': typeof AuthenticatedAdminCategoriasRoute
   '/_authenticated/admin/financeiro': typeof AuthenticatedAdminFinanceiroRoute
+  '/_authenticated/admin/relatorios': typeof AuthenticatedAdminRelatoriosRoute
   '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/_authenticated/contratante/empresa': typeof AuthenticatedContratanteEmpresaRoute
   '/_authenticated/contratante/pagamentos': typeof AuthenticatedContratantePagamentosRoute
@@ -309,6 +319,7 @@ export interface FileRouteTypes {
     | '/admin/auditoria'
     | '/admin/categorias'
     | '/admin/financeiro'
+    | '/admin/relatorios'
     | '/admin/usuarios'
     | '/contratante/empresa'
     | '/contratante/pagamentos'
@@ -336,6 +347,7 @@ export interface FileRouteTypes {
     | '/admin/auditoria'
     | '/admin/categorias'
     | '/admin/financeiro'
+    | '/admin/relatorios'
     | '/admin/usuarios'
     | '/contratante/empresa'
     | '/contratante/pagamentos'
@@ -367,6 +379,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/auditoria'
     | '/_authenticated/admin/categorias'
     | '/_authenticated/admin/financeiro'
+    | '/_authenticated/admin/relatorios'
     | '/_authenticated/admin/usuarios'
     | '/_authenticated/contratante/empresa'
     | '/_authenticated/contratante/pagamentos'
@@ -484,6 +497,13 @@ declare module '@tanstack/react-router' {
       path: '/financeiro'
       fullPath: '/admin/financeiro'
       preLoaderRoute: typeof AuthenticatedAdminFinanceiroRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/relatorios': {
+      id: '/_authenticated/admin/relatorios'
+      path: '/relatorios'
+      fullPath: '/admin/relatorios'
+      preLoaderRoute: typeof AuthenticatedAdminRelatoriosRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/admin/usuarios': {
@@ -605,6 +625,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminAuditoriaRoute: typeof AuthenticatedAdminAuditoriaRoute
   AuthenticatedAdminCategoriasRoute: typeof AuthenticatedAdminCategoriasRoute
   AuthenticatedAdminFinanceiroRoute: typeof AuthenticatedAdminFinanceiroRoute
+  AuthenticatedAdminRelatoriosRoute: typeof AuthenticatedAdminRelatoriosRoute
   AuthenticatedAdminUsuariosRoute: typeof AuthenticatedAdminUsuariosRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
@@ -614,6 +635,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminAuditoriaRoute: AuthenticatedAdminAuditoriaRoute,
     AuthenticatedAdminCategoriasRoute: AuthenticatedAdminCategoriasRoute,
     AuthenticatedAdminFinanceiroRoute: AuthenticatedAdminFinanceiroRoute,
+    AuthenticatedAdminRelatoriosRoute: AuthenticatedAdminRelatoriosRoute,
     AuthenticatedAdminUsuariosRoute: AuthenticatedAdminUsuariosRoute,
     AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   }

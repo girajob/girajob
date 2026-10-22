@@ -57,6 +57,7 @@ function Payments() {
   const pendingCheckin = rows.filter((r) => !r.checked_in_at).length;
   const totalGross = rows.filter((r) => r.payment_id).reduce((s, r) => s + Number(r.gross), 0);
   const totalNet = rows.filter((r) => r.payment_id).reduce((s, r) => s + Number(r.net ?? 0), 0);
+  const totalCharge = rows.filter((r) => r.payment_id).reduce((s, r) => s + Number(r.total_charge ?? r.gross), 0);
 
   return (
     <div className="space-y-6">
@@ -110,7 +111,7 @@ function Payments() {
                         <div className="font-display text-lg font-extrabold">{brl(r.gross)}</div>
                         {r.payment_id ? (
                           <div className="text-xs text-muted-foreground">
-                            taxa {brl(r.fee ?? 0)} · líquido {brl(r.net ?? 0)}{" "}
+                            profissional recebe {brl(r.net ?? 0)} (taxa {brl(r.pro_fee ?? 0)}) · sua taxa {brl(r.contractor_fee ?? 0)} · <strong>total a pagar {brl(r.total_charge ?? r.gross)}</strong>{" "}
                             <StatusPill status={r.payment_status ?? "pending"} label={PAY_LABEL[r.payment_status ?? "pending"]} />
                           </div>
                         ) : (
