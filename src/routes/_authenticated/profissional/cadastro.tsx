@@ -15,6 +15,7 @@ import { categoriesQuery } from "@/lib/pro-queries";
 import { uploadMedia, useMediaUrl } from "@/lib/media";
 import { errMsg } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import type { Database } from "@/integrations/supabase/types";
 
 export const Route = createFileRoute("/_authenticated/profissional/cadastro")({
   head: () => ({ meta: [{ title: "Cadastro do profissional — GiraJob" }] }),
@@ -79,7 +80,7 @@ function Wizard() {
     if (err) { toast.error(err); return; }
     setBusy(true);
     try {
-      const patch: Record<string, unknown> = { onboarding_step: Math.min(7, step + 1) };
+      const patch: Database["public"]["Tables"]["profiles"]["Update"] = { onboarding_step: Math.min(7, step + 1) };
       if (step === 1) Object.assign(patch, { full_name: f.full_name.trim(), phone: f.phone.trim(), birth_date: f.birth_date });
       if (step === 2) Object.assign(patch, { address_line: f.address_line.trim() || null, postal_code: f.postal_code.trim() || null, city: f.city.trim(), state: f.state.toUpperCase(), approx_lat: lat, approx_lng: lng });
       if (step === 3) Object.assign(patch, { avatar_url: avatar });

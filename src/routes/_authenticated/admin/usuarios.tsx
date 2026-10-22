@@ -23,7 +23,7 @@ function UsersPage() {
   const q = useQuery({
     queryKey: ["admin-users", search],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("admin_list_users", { _search: search || undefined });
+      const { data, error } = await supabase.rpc("admin_list_users", search ? { _search: search } : {});
       if (error) throw error;
       return data;
     },

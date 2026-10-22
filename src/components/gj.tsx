@@ -34,7 +34,7 @@ const tone: Record<string, string> = {
   blocked: "bg-destructive-soft text-destructive",
 };
 
-export function StatusPill({ status, label }: { status: string; label?: string }) {
+export function StatusPill({ status, label }: { status: string; label?: string | undefined }) {
   return (
     <span className={cn("inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold", tone[status] ?? "bg-muted")}>
       {label ?? JOB_STATUS_LABEL[status] ?? APP_STATUS_LABEL[status] ?? status}
@@ -42,7 +42,7 @@ export function StatusPill({ status, label }: { status: string; label?: string }
   );
 }
 
-export function Spinner({ label = "Carregando…" }: { label?: string }) {
+export function Spinner({ label = "Carregando…" }: { label?: string | undefined }) {
   return (
     <div className="flex items-center justify-center gap-2 py-16 text-muted-foreground" role="status">
       <Loader2 className="size-5 animate-spin" /> {label}

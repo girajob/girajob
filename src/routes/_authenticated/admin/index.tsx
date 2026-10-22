@@ -21,9 +21,9 @@ function Admin() {
     queryKey: ["admin-stats", f],
     queryFn: async () => {
       const { data, error } = await supabase.rpc("admin_stats", {
-        _city: f.city || undefined, _state: f.state.toUpperCase() || undefined,
-        _from: f.from ? new Date(f.from).toISOString() : undefined,
-        _to: f.to ? new Date(new Date(f.to).getTime() + 864e5).toISOString() : undefined,
+        ...(f.city ? { _city: f.city } : {}), ...(f.state ? { _state: f.state.toUpperCase() } : {}),
+        ...(f.from ? { _from: new Date(f.from).toISOString() } : {}),
+        ...(f.to ? { _to: new Date(new Date(f.to).getTime() + 864e5).toISOString() } : {}),
       });
       if (error) throw error;
       return data as unknown as Stats;
