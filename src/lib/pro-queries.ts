@@ -39,8 +39,8 @@ export const myApplicationsQuery = queryOptions({
   queryFn: async () => {
     const { data: u } = await supabase.auth.getUser();
     const { data, error } = await supabase
-      .from("applications").select(`*, jobs(${JOB_SELECT})`)
-      .eq("professional_id", u.user!.id).order("created_at", { ascending: false });
+      .from("applications").select(`*, job_roles(label, pay_amount, entry_time), jobs(${JOB_SELECT})`)
+      .eq("professional_id", u.user?.id ?? "").order("created_at", { ascending: false });
     if (error) throw error;
     return data;
   },
@@ -52,7 +52,7 @@ export const myBookingsQuery = queryOptions({
     const { data: u } = await supabase.auth.getUser();
     const { data, error } = await supabase
       .from("bookings").select(`*, jobs(${JOB_SELECT})`)
-      .eq("professional_id", u.user!.id).order("starts_at");
+      .eq("professional_id", u.user?.id ?? "").order("starts_at");
     if (error) throw error;
     return data;
   },

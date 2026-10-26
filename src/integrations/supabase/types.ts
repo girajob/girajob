@@ -19,6 +19,7 @@ export type Database = {
           created_at: string
           id: string
           job_id: string
+          job_role_id: string | null
           message: string | null
           professional_id: string
           status: Database["public"]["Enums"]["application_status"]
@@ -28,6 +29,7 @@ export type Database = {
           created_at?: string
           id?: string
           job_id: string
+          job_role_id?: string | null
           message?: string | null
           professional_id: string
           status?: Database["public"]["Enums"]["application_status"]
@@ -37,6 +39,7 @@ export type Database = {
           created_at?: string
           id?: string
           job_id?: string
+          job_role_id?: string | null
           message?: string | null
           professional_id?: string
           status?: Database["public"]["Enums"]["application_status"]
@@ -48,6 +51,13 @@ export type Database = {
             columns: ["job_id"]
             isOneToOne: false
             referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "applications_job_role_id_fkey"
+            columns: ["job_role_id"]
+            isOneToOne: false
+            referencedRelation: "job_roles"
             referencedColumns: ["id"]
           },
           {
@@ -98,7 +108,10 @@ export type Database = {
           ends_at: string
           id: string
           job_id: string
+          job_role_id: string | null
+          pay_amount: number | null
           professional_id: string
+          role_label: string | null
           starts_at: string
           status: Database["public"]["Enums"]["booking_status"]
           updated_at: string
@@ -111,7 +124,10 @@ export type Database = {
           ends_at: string
           id?: string
           job_id: string
+          job_role_id?: string | null
+          pay_amount?: number | null
           professional_id: string
+          role_label?: string | null
           starts_at: string
           status?: Database["public"]["Enums"]["booking_status"]
           updated_at?: string
@@ -124,7 +140,10 @@ export type Database = {
           ends_at?: string
           id?: string
           job_id?: string
+          job_role_id?: string | null
+          pay_amount?: number | null
           professional_id?: string
+          role_label?: string | null
           starts_at?: string
           status?: Database["public"]["Enums"]["booking_status"]
           updated_at?: string
@@ -149,6 +168,13 @@ export type Database = {
             columns: ["job_id"]
             isOneToOne: false
             referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_job_role_id_fkey"
+            columns: ["job_role_id"]
+            isOneToOne: false
+            referencedRelation: "job_roles"
             referencedColumns: ["id"]
           },
           {
@@ -1018,6 +1044,10 @@ export type Database = {
         Args: { _job: string; _message?: string }
         Returns: string
       }
+      apply_to_job_role: {
+        Args: { _job: string; _message?: string; _role?: string }
+        Returns: string
+      }
       check_in_booking: {
         Args: { _token: string }
         Returns: {
@@ -1080,6 +1110,7 @@ export type Database = {
           status: Database["public"]["Enums"]["application_status"]
         }[]
       }
+      job_applicants_with_role: { Args: { _job: string }; Returns: Json[] }
       job_payment_list: {
         Args: { _job: string }
         Returns: {
@@ -1099,6 +1130,7 @@ export type Database = {
           total_charge: number
         }[]
       }
+      job_payment_list_with_role: { Args: { _job: string }; Returns: Json[] }
       notify: {
         Args: { _body: string; _link: string; _title: string; _user: string }
         Returns: undefined
@@ -1106,6 +1138,10 @@ export type Database = {
       owns_company: { Args: { _company: string }; Returns: boolean }
       payment_instructions: { Args: { _payment: string }; Returns: Json }
       request_payout: { Args: { _job: string }; Returns: string }
+      role_starts_at: {
+        Args: { _entry: string; _starts: string }
+        Returns: string
+      }
       service_fee_pct: { Args: never; Returns: number }
       set_application_status: {
         Args: {
@@ -1124,6 +1160,10 @@ export type Database = {
       }
       set_user_role: {
         Args: { _role: Database["public"]["Enums"]["app_role"]; _user: string }
+        Returns: undefined
+      }
+      sync_job_roles: {
+        Args: { _job: string; _roles: Json }
         Returns: undefined
       }
       track_job_event: {

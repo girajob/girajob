@@ -10,7 +10,8 @@ import {
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { EmptyState, PageHeader, Spinner, StatusPill } from "@/components/gj";
-import { applicantsQuery } from "@/lib/contractor-queries";
+import { applicantsQuery, type RoleApplicant } from "@/lib/contractor-queries";
+import { useState } from "react";
 import { jobQuery } from "@/lib/pro-queries";
 import { useMediaUrl } from "@/lib/media";
 import { brl, errMsg, fmtShift } from "@/lib/format";
@@ -29,6 +30,7 @@ function ManageJob() {
   const qc = useQueryClient();
   const job = useQuery(jobQuery(id));
   const apps = useQuery(applicantsQuery(id));
+  const [roleFilter, setRoleFilter] = useState("");
   const refresh = () => { qc.invalidateQueries(); };
 
   async function setStatus(status: JobStatus) {
@@ -83,11 +85,12 @@ function ManageJob() {
       </div>
       <section>
         <h2 className="mb-3 text-xl font-extrabold">Candidatos</h2>
+        {!!apps.data?.some((a) => a.job_role_id) && <select aria-label="Filtrar candidatos por cargo" className="mb-3 h-10 rounded-lg border border-input bg-card px-3 text-sm" value={roleFilter} onChange={(e) => setRoleFilter(e.target.value)}><option value="">Todos os cargos</option>{Array.from(new Map(apps.data.filter((a) => a.job_role_id).map((a) => [a.job_role_id,a.role_label])).entries()).map(([id,label]) => <option key={id} value={id ?? ""}>{label}</option>)}</select>}
         {apps.isLoading ? <Spinner /> : !apps.data?.length ? (
           <EmptyState icon={Users} title="Nenhum candidato ainda" text="Quando alguém se candidatar, aparecerá aqui." />
         ) : (
           <div className="space-y-3">
-            {apps.data.map((a) => <Applicant key={a.application_id} a={a} onAction={appAction} />)}
+            {apps.data.filter((a) => !roleFilter || a.job_role_id===roleFilter).map((a) => <Applicant key={a.application_id} a={a} onAction={appAction} />)}
           </div>
         )}
       </section>
@@ -95,7 +98,7 @@ function ManageJob() {
   );
 }
 
-type Row = Database["public"]["Functions"]["job_applicants"]["Returns"][number];
+type Row = RoleApplicant;
 
 function Applicant({ a, onAction }: { a: Row; onAction: (id: string, act: "in_review" | "approved" | "rejected" | "hire") => void }) {
   const avatar = useMediaUrl(a.avatar_url);
@@ -111,6 +114,7 @@ function Applicant({ a, onAction }: { a: Row; onAction: (id: string, act: "in_re
             <span className="font-bold">{a.full_name ?? "Profissional"}</span>
             <StatusPill status={a.status} />
           </div>
+          {a.role_label && <div className="mt-1 text-sm font-semibold text-primary">{a.role_label} · {brl(a.role_pay_amount)} · {fmtShift(a.role_starts_at,a.role_starts_at).split("–")[0]}</div>}
           <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
             <span className="flex items-center gap-1"><MapPin className="size-3.5" />{a.city ?? "—"}{a.state ? `/${a.state}` : ""}{a.distance_km != null ? ` · ~${a.distance_km} km` : ""}</span>
             <span className="flex items-center gap-1"><Star className="size-3.5" />{a.avg_rating ?? "Sem avaliações"}</span>

@@ -43,7 +43,8 @@ function Agenda() {
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div>
                         <div className="font-bold">{b.jobs?.title}</div>
-                        <div className="text-sm text-muted-foreground">{fmtShift(b.starts_at, b.ends_at)} · {brl(b.jobs?.pay_amount)}</div>
+                        {b.role_label && <div className="font-semibold text-primary">{b.role_label}</div>}
+                        <div className="text-sm text-muted-foreground">{fmtShift(b.starts_at, b.ends_at)} · {brl(b.pay_amount ?? b.jobs?.pay_amount)}</div>
                         <div className="mt-1 flex items-center gap-1 text-sm"><MapPin className="size-3.5" />{b.jobs?.address ?? b.jobs?.venue_name} · {b.jobs?.city}</div>
                       </div>
                       <div className="flex items-center gap-2">

@@ -19,7 +19,7 @@ import { useMe } from "@/lib/session";
 import type { Database } from "@/integrations/supabase/types";
 
 type Job = Database["public"]["Tables"]["jobs"]["Row"];
-type RoleInput = StaffRole;
+type RoleInput = StaffRole & { id?: string };
 const sel = "h-10 w-full rounded-xl border border-input bg-card px-3 text-sm";
 
 function fromJob(j?: Job | null): JobFormInput {
@@ -60,7 +60,7 @@ export function JobForm({ job }: { job?: Job | null }) {
   useEffect(() => {
     if (existingRoles.data?.length && roles.length === 0) {
       setRoles(existingRoles.data.map((r) => ({
-        category_id: r.category_id ?? "", label: r.label, positions: r.positions,
+        id: r.id, category_id: r.category_id ?? "", label: r.label, positions: r.positions,
         pay_amount: Number(r.pay_amount), entry_time: r.entry_time ?? "",
       })));
     }
@@ -122,16 +122,13 @@ export function JobForm({ job }: { job?: Job | null }) {
       : await supabase.from("jobs").insert({ ...row, company_id: me.company.id }).select("id").single();
     if (res.error) { setBusy(false); toast.error(errMsg(res.error)); return; }
     const jobId = res.data.id;
-    const { error: deleteError } = await supabase.from("job_roles").delete().eq("job_id", jobId);
-    if (deleteError) { setBusy(false); toast.error(errMsg(deleteError)); return; }
     const roleRows = roles.filter((r) => r.label.trim()).map((r) => ({
+      ...(r.id ? { id: r.id } : {}),
       job_id: jobId, category_id: r.category_id || null, label: r.label.trim(),
       positions: r.positions || 1, pay_amount: r.pay_amount || 0, entry_time: r.entry_time || null,
     }));
-    if (roleRows.length) {
-      const { error: rErr } = await supabase.from("job_roles").insert(roleRows);
-      if (rErr) { setBusy(false); toast.error(errMsg(rErr)); return; }
-    }
+    const { error: rErr } = await supabase.rpc("sync_job_roles", { _job: jobId, _roles: roleRows });
+    if (rErr) { setBusy(false); toast.error(errMsg(rErr)); return; }
     setBusy(false);
     toast.success(publish ? "Vaga publicada!" : "Alterações salvas");
     qc.invalidateQueries();
