@@ -13,7 +13,7 @@ import { useMediaUrl } from "@/lib/media";
 import { brl, errMsg, fmtDate, fmtTime } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/profissional/vagas/$id")({
-  head: () => ({ meta: [{ title: "Detalhes da vaga — GiraJob" }] }),
+  head: () => ({ meta: [{ title: "Escolher cargo e candidatar-se — GiraJob" }, { name: "description", content: "Escolha o cargo, confira o valor e horário e envie sua candidatura ao evento." }, { property: "og:title", content: "Escolher cargo e candidatar-se — GiraJob" }, { property: "og:description", content: "Candidaturas para cargos de eventos GiraJob." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: JobDetail,
 });
 
@@ -38,6 +38,8 @@ function JobDetail() {
   const [open, setOpen] = useState(false);
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
+  const [roleId, setRoleId] = useState("");
+  const selectedRole = roles.data?.find((r) => r.id === roleId);
 
   useEffect(() => { supabase.rpc("track_job_event", { _job: id, _type: "view" }); }, [id]);
 
@@ -49,8 +51,9 @@ function JobDetail() {
     && (!j.application_deadline || new Date(j.application_deadline) > new Date());
 
   async function apply() {
+    if (roles.data?.length && !selectedRole) { toast.error("Escolha o cargo para se candidatar"); return; }
     setBusy(true);
-    const { error } = await supabase.rpc("apply_to_job", { _job: id, _message: msg });
+    const { error } = await supabase.rpc("apply_to_job_role", { _job: id, ... (selectedRole ? { _role: selectedRole.id } : {}), _message: msg });
     setBusy(false);
     if (error) { toast.error(errMsg(error)); return; }
     setOpen(false);
@@ -75,7 +78,7 @@ function JobDetail() {
         <Info icon={MapPin} label="Local" value={`${j.city}/${j.state}`} />
         <Info icon={Tag} label="Categoria" value={j.professional_categories?.name ?? "Geral"} />
         <Info icon={Users} label="Vagas" value={String(j.positions)} />
-        <div><div className="text-xs font-semibold text-muted-foreground">Remuneração</div><div className="font-display text-2xl font-extrabold text-cta">{brl(j.pay_amount)}</div></div>
+        <div><div className="text-xs font-semibold text-muted-foreground">Remuneração</div><div className="font-display text-2xl font-extrabold text-cta">{roles.data?.length ? "Por cargo" : brl(j.pay_amount)}</div></div>
       </div>
       {!!roles.data?.length && (
         <section>
@@ -93,6 +96,7 @@ function JobDetail() {
                   <span className="font-display font-extrabold text-cta">{brl(r.pay_amount)}</span>
                   {r.entry_time && <span className="ml-2 text-xs text-muted-foreground">entrada às {String(r.entry_time).slice(0, 5)}</span>}
                 </div>
+                {!app && <Button size="sm" variant="outline" disabled={!accepting} onClick={() => { setRoleId(r.id); setOpen(true); }}>Candidatar-se a {r.label}</Button>}
               </div>
             ))}
           </div>
@@ -106,10 +110,10 @@ function JobDetail() {
       <div className="sticky bottom-20 md:bottom-4">
         {app ? (
           <div className="flex items-center gap-2 rounded-2xl bg-success-soft p-4 font-semibold text-success">
-            <CheckCircle2 className="size-5" /> Você já se candidatou · <StatusPill status={app.status} />
+            <CheckCircle2 className="size-5" /> Você já se candidatou{app.job_roles?.label ? ` a ${app.job_roles.label}` : ""} · <StatusPill status={app.status} />
           </div>
         ) : (
-          <Button variant="cta" size="lg" className="w-full" disabled={!accepting}
+          <Button variant="cta" size="lg" className="w-full" disabled={!accepting || roles.isLoading || roles.isError}
             onClick={() => { setOpen(true); supabase.rpc("track_job_event", { _job: id, _type: "apply_started" }); }}>
             {accepting ? "Candidatar-se" : "Esta vaga não está aceitando candidaturas"}
           </Button>
@@ -118,9 +122,10 @@ function JobDetail() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader><DialogTitle>Confirmar candidatura</DialogTitle></DialogHeader>
-          <p className="text-sm text-muted-foreground">{j.title} · {fmtDate(j.starts_at)} {fmtTime(j.starts_at)}–{fmtTime(j.ends_at)} · {brl(j.pay_amount)}</p>
+          {!!roles.data?.length && <label className="space-y-2 text-sm font-semibold">Cargo da candidatura<select aria-label="Cargo da candidatura" className="h-10 w-full rounded-lg border border-input bg-card px-3" value={roleId} onChange={(e) => setRoleId(e.target.value)}><option value="">Selecione o cargo…</option>{roles.data.map((r) => <option key={r.id} value={r.id}>{r.label} · {brl(r.pay_amount)} · entrada {r.entry_time?.slice(0,5) ?? fmtTime(j.starts_at)}</option>)}</select></label>}
+          <p className="text-sm text-muted-foreground">{j.title} · {fmtDate(j.starts_at)} · entrada {selectedRole?.entry_time?.slice(0,5) ?? fmtTime(j.starts_at)}–{fmtTime(j.ends_at)} · {brl(selectedRole?.pay_amount ?? j.pay_amount)}</p>
           <Textarea placeholder="Mensagem para o contratante (opcional)" value={msg} onChange={(e) => setMsg(e.target.value)} maxLength={1000} />
-          <DialogFooter><Button variant="cta" disabled={busy} onClick={apply}>{busy ? "Enviando…" : "Enviar candidatura"}</Button></DialogFooter>
+          <DialogFooter><Button variant="cta" disabled={busy || (!!roles.data?.length && !selectedRole)} onClick={apply}>{busy ? "Enviando…" : "Enviar candidatura"}</Button></DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

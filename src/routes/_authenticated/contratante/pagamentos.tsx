@@ -22,6 +22,7 @@ type Row = {
   payment_status: string | null; fee: number | null; net: number | null;
   pro_fee: number | null; contractor_fee: number | null; total_charge: number | null;
   pix_key: string | null; pix_key_type: string | null;
+  role_label: string | null;
 };
 
 const PIX_TYPE_LABEL: Record<string, string> = { cpf: "CPF", cnpj: "CNPJ", email: "E-mail", phone: "Telefone", random: "Chave aleatória" };
@@ -40,9 +41,10 @@ function Payments() {
     queryKey: ["payment-list", jobId],
     enabled: !!jobId,
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("job_payment_list", { _job: jobId! });
+      if (!jobId) return [];
+      const { data, error } = await supabase.rpc("job_payment_list_with_role", { _job: jobId });
       if (error) throw error;
-      return data as Row[];
+      return data as unknown as Row[];
     },
   });
 
@@ -127,6 +129,7 @@ function Payments() {
                     <div key={r.booking_id} className="animate-rise flex flex-wrap items-center justify-between gap-3 rounded-2xl border bg-card p-4 shadow-card">
                       <div>
                         <div className="font-bold">{r.professional_name}</div>
+                        {r.role_label && <div className="text-sm font-semibold text-primary">{r.role_label}</div>}
                         <div className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
                           {r.checked_in_at ? (
                             <span className="flex items-center gap-1 font-semibold text-success"><LogIn className="size-3.5" /> Entrada às {fmtTime(r.checked_in_at)}</span>

@@ -34,7 +34,8 @@ function Apps() {
             <div key={a.id} className="animate-rise flex flex-wrap items-center justify-between gap-3 rounded-2xl border bg-card p-4 shadow-card">
               <Link to="/profissional/vagas/$id" params={{ id: a.job_id }} className="min-w-0">
                 <div className="font-bold">{a.jobs.title}</div>
-                <div className="text-sm text-muted-foreground">{fmtShift(a.jobs.starts_at, a.jobs.ends_at)} · {a.jobs.city} · {brl(a.jobs.pay_amount)}</div>
+                {a.job_roles && <div className="font-semibold text-primary">{a.job_roles.label} · entrada {a.job_roles.entry_time?.slice(0,5)}</div>}
+                <div className="text-sm text-muted-foreground">{fmtShift(a.jobs.starts_at, a.jobs.ends_at)} · {a.jobs.city} · {brl(a.job_roles?.pay_amount ?? a.jobs.pay_amount)}</div>
               </Link>
               <div className="flex items-center gap-2">
                 <StatusPill status={a.status} />
