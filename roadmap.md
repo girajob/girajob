@@ -2,3 +2,8 @@
 - [x] Permitir editar cargos e valores em Meus preços.
 - [x] Montar cargos do evento a partir do catálogo, com quantidades e horários próprios.
 - [x] Conferir importação, totais e salvamento com testes e uso real.
+
+# Candidatura por cargo
+- [ ] Permitir escolher um cargo na candidatura e mostrar a escolha ao profissional e ao contratante.
+- [ ] Vincular contratação, limite de vagas, horário e valor ao cargo escolhido, preservando eventos antigos.
+- [ ] Preservar cargos vinculados ao editar eventos e testar o fluxo completo.
