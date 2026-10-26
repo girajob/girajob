@@ -78,6 +78,13 @@
       "when": 1792696221327,
       "tag": "0010_profile_pix_keys",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1793041662887,
+      "tag": "0011_role_specific_applications",
+      "breakpoints": true
     }
   ]
 }
