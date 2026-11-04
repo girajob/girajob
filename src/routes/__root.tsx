@@ -84,7 +84,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "Encontre e contrate profissionais para eventos, festas, bares e restaurantes." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "theme-color", content: "#3b1a6b" },
+      { name: "theme-color", content: "#0B2342" },
     ],
     links: [
       {
