@@ -902,6 +902,36 @@ export type Database = {
           },
         ]
       }
+      status_history: {
+        Row: {
+          changed_by: string | null
+          created_at: string
+          entity: string
+          entity_id: string
+          from_status: string | null
+          id: number
+          to_status: string
+        }
+        Insert: {
+          changed_by?: string | null
+          created_at?: string
+          entity: string
+          entity_id: string
+          from_status?: string | null
+          id?: never
+          to_status: string
+        }
+        Update: {
+          changed_by?: string | null
+          created_at?: string
+          entity?: string
+          entity_id?: string
+          from_status?: string | null
+          id?: never
+          to_status?: string
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           amount: number
