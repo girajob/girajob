@@ -9,5 +9,5 @@
 - [ ] Preservar cargos vinculados ao editar eventos e testar o fluxo completo.
 # Evolução (plano completo)
 - [x] Etapa 1a: nova identidade visual (turquesa, laranja, lima, azul-marinho).
-- [ ] Etapa 1b: concluir candidatura por cargo e estados padronizados com histórico.
+- [x] Etapa 1b: candidatura por cargo e histórico de status (falta teste completo com usuários reais).
 - [ ] Etapas 2–10 conforme plano aprovado (aguardam aprovação de cada etapa).

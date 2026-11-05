@@ -5,6 +5,7 @@ import { FileText } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { EmptyState, PageHeader, Spinner, StatusPill } from "@/components/gj";
+import { StatusHistory } from "@/components/status-history";
 import { myApplicationsQuery } from "@/lib/pro-queries";
 import { brl, errMsg, fmtShift } from "@/lib/format";
 
@@ -36,6 +37,7 @@ function Apps() {
                 <div className="font-bold">{a.jobs.title}</div>
                 {a.job_roles && <div className="font-semibold text-primary">{a.job_roles.label} · entrada {a.job_roles.entry_time?.slice(0,5)}</div>}
                 <div className="text-sm text-muted-foreground">{fmtShift(a.jobs.starts_at, a.jobs.ends_at)} · {a.jobs.city} · {brl(a.job_roles?.pay_amount ?? a.jobs.pay_amount)}</div>
+                <details className="mt-1" onClick={(e) => e.stopPropagation()}><summary className="cursor-pointer text-xs font-semibold text-primary">Histórico</summary><StatusHistory entity="application" id={a.id} /></details>
               </Link>
               <div className="flex items-center gap-2">
                 <StatusPill status={a.status} />
