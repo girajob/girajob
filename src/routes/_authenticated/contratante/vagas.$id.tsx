@@ -32,6 +32,7 @@ function ManageJob() {
   const job = useQuery(jobQuery(id));
   const apps = useQuery(applicantsQuery(id));
   const [roleFilter, setRoleFilter] = useState("");
+  const [view, setView] = useState<"board" | "list">("board");
   const refresh = () => { qc.invalidateQueries(); };
 
   async function setStatus(status: JobStatus) {
@@ -45,6 +46,19 @@ function ManageJob() {
       : await supabase.rpc("set_application_status", { _app: appId, _status: action });
     if (error) { toast.error(errMsg(error)); return; }
     toast.success(action === "hire" ? "Contratação confirmada!" : "Candidatura atualizada"); refresh();
+  }
+
+  async function batchAction(ids: string[], action: Action) {
+    let ok = 0; const fails: string[] = [];
+    for (const appId of ids) {
+      const { error } = action === "hire"
+        ? await supabase.rpc("confirm_hire", { _app: appId })
+        : await supabase.rpc("set_application_status", { _app: appId, _status: action });
+      if (error) fails.push(errMsg(error)); else ok++;
+    }
+    if (ok) toast.success(`${ok} candidatura(s) atualizada(s)`);
+    if (fails.length) toast.error(`${fails.length} não puderam ser atualizadas: ${fails[0]}`);
+    refresh();
   }
 
   if (job.isLoading) return <Spinner />;
@@ -90,9 +104,23 @@ function ManageJob() {
         {apps.isLoading ? <Spinner /> : !apps.data?.length ? (
           <EmptyState icon={Users} title="Nenhum candidato ainda" text="Quando alguém se candidatar, aparecerá aqui." />
         ) : (
-          <div className="space-y-3">
-            {apps.data.filter((a) => !roleFilter || a.job_role_id===roleFilter).map((a) => <Applicant key={a.application_id} a={a} onAction={appAction} />)}
-          </div>
+          <>
+            <div className="mb-3 inline-flex rounded-lg border bg-card p-1 text-sm font-semibold">
+              {(["board", "list"] as const).map((v) => (
+                <button key={v} type="button" onClick={() => setView(v)}
+                  className={`rounded-md px-3 py-1 ${view === v ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>
+                  {v === "board" ? "Quadro" : "Lista"}
+                </button>
+              ))}
+            </div>
+            {view === "board" ? (
+              <ApplicantBoard apps={apps.data.filter((a) => !roleFilter || a.job_role_id === roleFilter)} onBatch={batchAction} />
+            ) : (
+              <div className="space-y-3">
+                {apps.data.filter((a) => !roleFilter || a.job_role_id===roleFilter).map((a) => <Applicant key={a.application_id} a={a} onAction={appAction} />)}
+              </div>
+            )}
+          </>
         )}
       </section>
     </div>
@@ -100,6 +128,75 @@ function ManageJob() {
 }
 
 type Row = RoleApplicant;
+type Action = "in_review" | "approved" | "rejected" | "hire";
+
+const COLUMNS: { key: string; title: string; statuses: string[]; actions: { a: Action; label: string }[] }[] = [
+  { key: "new", title: "Novos", statuses: ["applied"], actions: [{ a: "in_review", label: "Em análise" }, { a: "approved", label: "Aprovar" }, { a: "rejected", label: "Recusar" }] },
+  { key: "review", title: "Em análise", statuses: ["in_review"], actions: [{ a: "approved", label: "Aprovar" }, { a: "rejected", label: "Recusar" }] },
+  { key: "approved", title: "Aprovados", statuses: ["approved"], actions: [{ a: "hire", label: "Contratar" }, { a: "rejected", label: "Recusar" }] },
+  { key: "hired", title: "Contratados", statuses: ["hired"], actions: [] },
+  { key: "out", title: "Recusados / desistentes", statuses: ["rejected", "withdrawn"], actions: [] },
+];
+
+function ApplicantBoard({ apps, onBatch }: { apps: Row[]; onBatch: (ids: string[], a: Action) => Promise<void> }) {
+  const [sel, setSel] = useState<Record<string, string[]>>({});
+  const [busy, setBusy] = useState(false);
+  const toggle = (col: string, id: string) => setSel((s) => {
+    const cur = s[col] ?? [];
+    return { ...s, [col]: cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id] };
+  });
+  return (
+    <div className="flex gap-3 overflow-x-auto pb-2">
+      {COLUMNS.map((c) => {
+        const items = apps.filter((a) => c.statuses.includes(a.status));
+        const chosen = (sel[c.key] ?? []).filter((id) => items.some((i) => i.application_id === id));
+        const allOn = items.length > 0 && chosen.length === items.length;
+        return (
+          <div key={c.key} className="w-64 shrink-0 rounded-2xl border bg-muted/50 p-3">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-sm font-bold">{c.title}</span>
+              <span className="rounded-full bg-card px-2 text-xs font-semibold">{items.length}</span>
+            </div>
+            {c.actions.length > 0 && items.length > 0 && (
+              <label className="mb-2 flex items-center gap-2 text-xs text-muted-foreground">
+                <input type="checkbox" checked={allOn}
+                  onChange={() => setSel((s) => ({ ...s, [c.key]: allOn ? [] : items.map((i) => i.application_id) }))} />
+                Selecionar todos
+              </label>
+            )}
+            {chosen.length > 0 && (
+              <div className="mb-2 flex flex-wrap gap-1 rounded-xl bg-card p-2">
+                <span className="w-full text-xs font-semibold">{chosen.length} selecionado(s)</span>
+                {c.actions.map((x) => (
+                  <Button key={x.a} size="sm" disabled={busy} variant={x.a === "rejected" ? "ghost" : x.a === "hire" ? "cta" : "secondary"}
+                    onClick={async () => { setBusy(true); await onBatch(chosen, x.a); setSel((s) => ({ ...s, [c.key]: [] })); setBusy(false); }}>
+                    {x.label}
+                  </Button>
+                ))}
+              </div>
+            )}
+            <div className="space-y-2">
+              {items.map((a) => (
+                <label key={a.application_id} className="block cursor-pointer rounded-xl border bg-card p-2 text-sm shadow-card">
+                  <div className="flex items-start gap-2">
+                    {c.actions.length > 0 && <input type="checkbox" className="mt-1" checked={chosen.includes(a.application_id)} onChange={() => toggle(c.key, a.application_id)} />}
+                    <div className="min-w-0">
+                      <div className="truncate font-semibold">{a.full_name ?? "Profissional"}</div>
+                      {a.role_label && <div className="text-xs font-semibold text-primary">{a.role_label} · {brl(a.role_pay_amount)}</div>}
+                      <div className="text-xs text-muted-foreground">{a.avg_rating ? `★ ${a.avg_rating}` : "Sem avaliações"}{a.distance_km != null ? ` · ~${a.distance_km} km` : ""}</div>
+                      {a.has_conflict && a.status !== "hired" && <div className="text-xs font-bold text-warning">Conflito de horário</div>}
+                    </div>
+                  </div>
+                </label>
+              ))}
+              {!items.length && <p className="py-4 text-center text-xs text-muted-foreground">Vazio</p>}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 function Applicant({ a, onAction }: { a: Row; onAction: (id: string, act: "in_review" | "approved" | "rejected" | "hire") => void }) {
   const avatar = useMediaUrl(a.avatar_url);
