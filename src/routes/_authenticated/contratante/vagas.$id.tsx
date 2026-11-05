@@ -13,6 +13,7 @@ import { EmptyState, PageHeader, Spinner, StatusPill } from "@/components/gj";
 import { applicantsQuery, type RoleApplicant } from "@/lib/contractor-queries";
 import { useState } from "react";
 import { jobQuery } from "@/lib/pro-queries";
+import { StatusHistory } from "@/components/status-history";
 import { useMediaUrl } from "@/lib/media";
 import { brl, errMsg, fmtShift } from "@/lib/format";
 import { fillRate } from "@/lib/jobs";
@@ -121,6 +122,7 @@ function Applicant({ a, onAction }: { a: Row; onAction: (id: string, act: "in_re
           </div>
           {!!a.categories?.length && <div className="mt-2 flex flex-wrap gap-1">{a.categories.map((c) => <span key={c} className="rounded-full bg-muted px-2 py-0.5 text-xs font-semibold">{c}</span>)}</div>}
           {a.message && <p className="mt-2 text-sm">“{a.message}”</p>}
+          <details className="mt-2"><summary className="cursor-pointer text-xs font-semibold text-primary">Histórico</summary><StatusHistory entity="application" id={a.application_id} /></details>
           {a.has_conflict && a.status !== "hired" && (
             <p className="mt-2 flex items-center gap-1.5 text-xs font-bold text-warning"><AlertTriangle className="size-3.5" /> Já tem outro trabalho confirmado nesse horário</p>
           )}
