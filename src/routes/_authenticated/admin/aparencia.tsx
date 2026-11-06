@@ -29,7 +29,7 @@ function Appearance() {
     setSaving(true);
     const { error } = await supabase.rpc("set_platform_setting", { _key: "theme", _value: t });
     setSaving(false);
-    if (error) return toast.error("Não foi possível salvar as cores.");
+    if (error) { toast.error("Não foi possível salvar as cores."); return; }
     toast.success("Cores salvas para toda a plataforma.");
   }
 
